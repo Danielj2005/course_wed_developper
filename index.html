@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso Completo de Desarrollo Web</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #374151;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.25rem;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .module-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .js-icon { background: linear-gradient(135deg, #f7df1e, #fbbf24); color: #1f2937; }
+        .html-icon { background: linear-gradient(135deg, #e34f26, #f97316); color: white; }
+        .css-icon { background: linear-gradient(135deg, #1572b6, #3b82f6); color: white; }
+        .tailwind-icon { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
+
+        .module-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+
+        .module-card p {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        .module-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .module-link:hover {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+            transform: translateX(5px);
+        }
+
+        .module-link::after {
+            content: '→';
+            margin-left: 0.5rem;
+            transition: margin-left 0.2s ease;
+        }
+
+        .module-link:hover::after {
+            margin-left: 0.75rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 1rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            .modules {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚀 Curso Completo de Desarrollo Web</h1>
+            <p>Aprende desarrollo web moderno desde cero. Este curso te guiará a través de JavaScript, HTML, CSS y frameworks modernos para convertirte en un desarrollador full-stack.</p>
+        </header>
+
+        <main class="modules">
+            <div class="module-card">
+                <div class="module-icon js-icon">⚡</div>
+                <h3>JavaScript Moderno</h3>
+                <p>Domina JavaScript ES6+, funciones, objetos, asincronía, DOM manipulation y mejores prácticas para desarrollo web moderno.</p>
+                <a href="guia_aprendizaje_js.js" class="module-link" target="_blank">Ver Guía de JavaScript</a>
+                <br><br>
+                <a href="ejercicios_js.js" class="module-link" target="_blank">Ver Ejercicios Prácticos</a>
+                <br><br>
+                <a href="tipos_de_datos.ts" class="module-link" target="_blank">Referencia de Tipos de Datos</a>
+            </div>
+
+            <div class="module-card">
+                <div class="module-icon html-icon">🏗️</div>
+                <h3>HTML5 + Bootstrap</h3>
+                <p>Aprende HTML semántico, SEO, accesibilidad y Bootstrap 5 para crear interfaces responsivas y profesionales.</p>
+                <a href="html/index.html" class="module-link">Ir a HTML + Bootstrap</a>
+            </div>
+
+            <div class="module-card">
+                <div class="module-icon css-icon">🎨</div>
+                <h3>CSS3 Avanzado</h3>
+                <p>Maestrea CSS3 con Flexbox, Grid, animaciones, responsive design y técnicas modernas de layout.</p>
+                <a href="css-css3/index.html" class="module-link">Ir a CSS + CSS3</a>
+            </div>
+
+            <div class="module-card">
+                <div class="module-icon tailwind-icon">🌊</div>
+                <h3>Tailwind CSS</h3>
+                <p>Framework utility-first para desarrollo rápido. Aprende clases utilitarias, responsive design y mejores prácticas.</p>
+                <a href="tailwind/index.html" class="module-link">Ir a Tailwind CSS</a>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>💡 Este curso está diseñado para principiantes y desarrolladores intermedios que quieren dominar el desarrollo web moderno.</p>
+            <p>📚 Cada módulo incluye teoría, ejemplos prácticos y mejores prácticas del mundo real.</p>
+        </footer>
+    </div>
+</body>
+</html>
