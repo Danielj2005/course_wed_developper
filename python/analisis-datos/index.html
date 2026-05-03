@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Datos con Python</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f7f9fc; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 24px; border-radius: 10px; box-shadow: 0 0 18px rgba(0,0,0,0.08); }
+        h1, h2, h3 { color: #1d3557; }
+        .nav { background: #1d3557; color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 16px; text-decoration: none; font-weight: bold; }
+        .section { margin-bottom: 28px; }
+        code { background: #eef2f7; padding: 3px 6px; border-radius: 4px; }
+        pre { background: #f2f6fc; padding: 14px; border-radius: 8px; overflow-x: auto; }
+        .example { border-left: 4px solid #1d3557; padding-left: 12px; margin: 14px 0; }
+        .list-inline { display: flex; flex-wrap: wrap; gap: 10px; }
+        .list-inline span { background: #dbeafe; color: #1d3557; padding: 6px 10px; border-radius: 6px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#instalacion">Instalación</a>
+            <a href="#pandas">Pandas</a>
+            <a href="#numpy">NumPy</a>
+            <a href="#visualizacion">Visualización</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>📊 Análisis de Datos con Python</h1>
+        <p>Esta guía introduce el flujo básico de análisis de datos con Python: cargar datos, limpiar, explorar, visualizar y extraer conclusiones usando librerías estándar.</p>
+
+        <section id="intro" class="section">
+            <h2>¿Por qué usar Python para análisis de datos?</h2>
+            <ul>
+                <li>Python cuenta con herramientas potentes como <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code> y <code>seaborn</code>.</li>
+                <li>Es fácil pasar de datos en bruto a resultados visuales.</li>
+                <li>Permite automatizar procesos y crear pipelines de análisis reproducibles.</li>
+                <li>Es la base para ciencia de datos y machine learning.</li>
+            </ul>
+        </section>
+
+        <section id="instalacion" class="section">
+            <h2>Instalación de librerías</h2>
+            <div class="example">
+                <pre><code>pip install pandas numpy matplotlib seaborn scikit-learn</code></pre>
+            </div>
+            <p>Estas librerías te permiten manipular tablas, hacer cálculos numéricos y crear gráficos para explorar la información.</p>
+        </section>
+
+        <section id="pandas" class="section">
+            <h2>Pandas - Manipulación de Datos</h2>
+            <h3>Cargar datos</h3>
+            <div class="example">
+                <pre><code>import pandas as pd
+
+# Cargar un archivo CSV
+ruta = 'datos/ventas.csv'
+df = pd.read_csv(ruta)
+print(df.head())</code></pre>
+            </div>
+
+            <h3>Exploración inicial</h3>
+            <div class="example">
+                <pre><code>print(df.info())
+print(df.describe())
+print(df.columns)
+print(df.isnull().sum())</code></pre>
+            </div>
+
+            <h3>Limpieza de datos</h3>
+            <div class="example">
+                <pre><code># Eliminar filas con valores faltantes
+ df = df.dropna()
+
+# Cambiar tipos de datos
+df['fecha'] = pd.to_datetime(df['fecha'])
+
+# Rellenar valores nulos
+df['categoria'].fillna('Desconocido', inplace=True)
+
+# Eliminar duplicados
+df = df.drop_duplicates()</code></pre>
+            </div>
+
+            <h3>Agrupaciones y resúmenes</h3>
+            <div class="example">
+                <pre><code>ventas_por_mes = df.groupby(df['fecha'].dt.to_period('M')).sum()
+print(ventas_por_mes)
+
+ventas_por_categoria = df.groupby('categoria')['monto'].sum().reset_index()
+print(ventas_por_categoria)</code></pre>
+            </div>
+        </section>
+
+        <section id="numpy" class="section">
+            <h2>NumPy - Cálculos numéricos</h2>
+            <h3>Uso básico</h3>
+            <div class="example">
+                <pre><code>import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+print(arr.mean())
+print(arr.std())
+print(arr.sum())
+
+matriz = np.array([[1, 2], [3, 4]])
+print(np.linalg.inv(matriz))</code></pre>
+            </div>
+
+            <h3>Integración con pandas</h3>
+            <div class="example">
+                <pre><code>df['monto_normalizado'] = (df['monto'] - df['monto'].mean()) / df['monto'].std()
+print(df.head())</code></pre>
+            </div>
+        </section>
+
+        <section id="visualizacion" class="section">
+            <h2>Visualización</h2>
+            <h3>Gráficos con Matplotlib</h3>
+            <div class="example">
+                <pre><code>import matplotlib.pyplot as plt
+
+plt.figure(figsize=(8, 5))
+plt.plot(df['fecha'], df['monto'], marker='o')
+plt.title('Ventas por Fecha')
+plt.xlabel('Fecha')
+plt.ylabel('Monto')
+plt.grid(True)
+plt.show()</code></pre>
+            </div>
+
+            <h3>Gráficos con Seaborn</h3>
+            <div class="example">
+                <pre><code>import seaborn as sns
+
+sns.set(style='whitegrid')
+plt.figure(figsize=(10, 6))
+sns.barplot(x='categoria', y='monto', data=ventas_por_categoria)
+plt.title('Ventas por Categoría')
+plt.xticks(rotation=45)
+plt.show()</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyecto de ejemplo</h2>
+            <ol>
+                <li>Cargar un dataset real (CSV o Excel) con <code>pandas</code>.</li>
+                <li>Inspeccionar columnas, tipos y valores faltantes.</li>
+                <li>Limpiar datos y transformar columnas clave.</li>
+                <li>Generar métricas como totales, promedios y distribución.</li>
+                <li>Crear gráficos ejecutables para visualizar patrones.</li>
+            </ol>
+            <div class="example">
+                <pre><code># Ejemplo de análisis simple
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+ruta = 'datos/ventas.csv'
+df = pd.read_csv(ruta)
+df['fecha'] = pd.to_datetime(df['fecha'])
+df = df.dropna(subset=['monto'])
+
+grupo = df.groupby('categoria')['monto'].sum().reset_index()
+
+sns.barplot(x='categoria', y='monto', data=grupo)
+plt.title('Ventas por Categoría')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()</code></pre>
+            </div>
+
+            <h3>Extensiones</h3>
+            <ul>
+                <li>Usar <code>scikit-learn</code> para modelos básicos.</li>
+                <li>Crear dashboards con <code>Streamlit</code> o <code>Dash</code>.</li>
+                <li>Conectar datos a bases de datos SQL o a APIs.</li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>

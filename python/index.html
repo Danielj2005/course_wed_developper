@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python desde Cero</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 22px; border-radius: 10px; box-shadow: 0 0 16px rgba(0,0,0,0.08); }
+        h1, h2, h3 { color: #222; }
+        .nav { background: #306998; color: white; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 18px; text-decoration: none; font-weight: bold; }
+        .section { margin-bottom: 28px; }
+        code { background: #f2f2f2; padding: 3px 6px; border-radius: 4px; }
+        pre { background: #f8f8f8; padding: 14px; border-radius: 7px; overflow-x: auto; }
+        .example { border-left: 4px solid #306998; padding-left: 10px; margin: 14px 0; }
+        .links a { display: inline-block; margin: 8px 10px 0 0; color: #306998; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#setup">Entorno</a>
+            <a href="#basics">Conceptos Básicos</a>
+            <a href="#control">Control</a>
+            <a href="#funciones">Funciones</a>
+            <a href="#oop">POO</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>🐍 Python desde Cero</h1>
+        <p>Esta guía te introduce a Python como lenguaje, desde la instalación hasta los conceptos básicos necesarios para comenzar a crear aplicaciones web, automatizaciones y análisis de datos.</p>
+
+        <section id="intro" class="section">
+            <h2>¿Qué es Python?</h2>
+            <p>Python es un lenguaje de programación interpretado, de alto nivel y con sintaxis clara. Es ideal para aprender programación, desarrollar aplicaciones web, automatizar tareas, analizar datos y construir modelos avanzados.</p>
+            <h3>Ventajas de Python</h3>
+            <ul>
+                <li><strong>Fácil de leer:</strong> Sintaxis simple y expresiva.</li>
+                <li><strong>Multipropósito:</strong> Web, datos, automatización, ciencia, scripting.</li>
+                <li><strong>Gran comunidad:</strong> Librerías y recursos abundantemente disponibles.</li>
+                <li><strong>Productividad:</strong> Menos código para hacer más cosas.</li>
+                <li><strong>Portable:</strong> Funciona en Windows, macOS y Linux.</li>
+            </ul>
+        </section>
+
+        <section id="flujo" class="section">
+            <h2>Flujo de Aprendizaje en Python</h2>
+            <p>Este curso te guía paso a paso, desde los fundamentos hasta usar Python en web y datos:</p>
+            <ol>
+                <li><strong>Instalación y entorno:</strong> configura Python y entornos virtuales.</li>
+                <li><strong>Conceptos básicos:</strong> variables, tipos, operadores y estructuras de datos.</li>
+                <li><strong>Control de flujo:</strong> aprende condicionales y bucles.</li>
+                <li><strong>Funciones:</strong> crea bloques reutilizables y limpia tu código.</li>
+                <li><strong>POO:</strong> modela datos con clases y objetos.</li>
+                <li><strong>Aplicaciones web:</strong> pasa a Django y Flask para construir sitios y APIs.</li>
+                <li><strong>Análisis de datos:</strong> usa pandas, NumPy y visualización para extraer valor de los datos.</li>
+                <li><strong>Proyectos prácticos:</strong> combina todo en aplicaciones reales y portafolios.</li>
+            </ol>
+            <p>Avanza hacia estos recursos cuando estés listo:</p>
+            <ul class="list-inline">
+                <li><a href="python/django/index.html">Django</a></li>
+                <li><a href="python/flask/index.html">Flask</a></li>
+                <li><a href="python/analisis-datos/index.html">Análisis de Datos</a></li>
+                <li><a href="python/sqlite/index.html">SQLite</a></li>
+            </ul>
+        </section>
+
+        <section id="setup" class="section">
+            <h2>Instalación y Entorno</h2>
+            <p>Comenzar en Python requiere crear un entorno virtual y tener el intérprete instalado. Esto evita conflictos entre versiones y dependencias.</p>
+            <div class="example">
+                <pre><code># Verificar versión de Python
+python --version
+
+# Crear entorno virtual
+python -m venv venv
+
+# Activar entorno virtual - Windows
+venv\Scripts\activate
+
+# Activar entorno virtual - macOS / Linux
+source venv/bin/activate
+
+# Actualizar pip y comprobar instalación
+python -m pip install --upgrade pip
+pip --version</code></pre>
+            </div>
+            <h3>Recomendación</h3>
+            <p>Siempre usa un entorno virtual para cada proyecto y guarda las dependencias en <code>requirements.txt</code>.</p>
+        </section>
+
+        <section id="basics" class="section">
+            <h2>Conceptos Básicos</h2>
+            <h3>Variables y Tipos</h3>
+            <div class="example">
+                <pre><code>nombre = 'Ana'
+edad = 28
+estudiante = True
+precio = 49.99
+frutas = ['manzana', 'pera', 'uva']
+datos = {'nombre': 'Ana', 'edad': 28}</code></pre>
+            </div>
+
+            <h3>Operadores</h3>
+            <div class="example">
+                <pre><code>a = 10
+b = 3
+suma = a + b
+resta = a - b
+multiplicacion = a * b
+division = a / b
+potencia = a ** b
+modulo = a % b
+comparacion = a >= b</code></pre>
+            </div>
+
+            <h3>Estructuras de datos</h3>
+            <div class="example">
+                <pre><code>lista = [1, 2, 3, 4]
+set_numeros = {1, 2, 3}
+tupla = (1, 2, 3)
+diccionario = {'nombre': 'Ana', 'curso': 'Python'}</code></pre>
+            </div>
+        </section>
+
+        <section id="control" class="section">
+            <h2>Control de Flujo</h2>
+            <h3>Condicionales</h3>
+            <div class="example">
+                <pre><code>edad = 20
+if edad >= 18:
+    print('Eres mayor de edad')
+elif edad >= 13:
+    print('Eres adolescente')
+else:
+    print('Eres niño')</code></pre>
+            </div>
+
+            <h3>Bucle for</h3>
+            <div class="example">
+                <pre><code>nombres = ['Ana', 'Luis', 'Marta']
+for nombre in nombres:
+    print(nombre)
+
+for i in range(5):
+    print(i)</code></pre>
+            </div>
+
+            <h3>Bucle while</h3>
+            <div class="example">
+                <pre><code>contador = 0
+while contador < 5:
+    print(contador)
+    contador += 1</code></pre>
+            </div>
+        </section>
+
+        <section id="funciones" class="section">
+            <h2>Funciones</h2>
+            <p>Las funciones agrupan lógica reutilizable y hacen el código más limpio y mantenible.</p>
+            <div class="example">
+                <pre><code>def saludar(nombre):
+    return f'Hola, {nombre}!'
+
+mensaje = saludar('Ana')
+print(mensaje)
+
+# Función con valores por defecto
+def potencia(base, exponente=2):
+    return base ** exponente
+
+print(potencia(5))  # 25
+print(potencia(5, 3))  # 125</code></pre>
+            </div>
+        </section>
+
+        <section id="oop" class="section">
+            <h2>Programación Orientada a Objetos</h2>
+            <p>Python permite definir clases y objetos para modelar datos y comportamientos.</p>
+            <div class="example">
+                <pre><code>class Persona:
+    def __init__(self, nombre, edad):
+        self.nombre = nombre
+        self.edad = edad
+
+    def presentarse(self):
+        return f'Mi nombre es {self.nombre} y tengo {self.edad} años.'
+
+persona = Persona('Ana', 28)
+print(persona.presentarse())</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Sugeridos</h2>
+            <ul>
+                <li>Calculadora de consola</li>
+                <li>Gestor de tareas con archivos</li>
+                <li>Scraper básico con <code>requests</code> y <code>BeautifulSoup</code></li>
+                <li>API simple para practicar Flask</li>
+                <li>Análisis de datos con pandas y matplotlib</li>
+            </ul>
+            <div class="links">
+                <a href="python/django/index.html">Django</a>
+                <a href="python/flask/index.html">Flask</a>
+                <a href="python/sqlite/index.html">SQLite</a>
+                <a href="python/analisis-datos/index.html">Análisis de Datos</a>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
