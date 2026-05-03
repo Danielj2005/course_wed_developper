@@ -21,7 +21,10 @@
         <div class="nav">
             <a href="#intro">Introducción</a>
             <a href="#fundamentos">Fundamentos</a>
+            <a href="#funciones">Funciones Nativas</a>
             <a href="#poo">POO</a>
+            <a href="#mvc">MVC</a>
+            <a href="#plantillas">Sistema de Plantillas</a>
             <a href="#mysqli">MySQLi</a>
             <a href="#pdo">PDO</a>
             <a href="#proyectos">Proyectos</a>
@@ -108,9 +111,152 @@ function crearUsuario($nombre, $email, $activo = true) {
 echo saludar("María");
 ?&gt;</code></pre>
             </div>
-        </section>
+        <section id="funciones" class="section">
+            <h2>Funciones Nativas Esenciales de PHP</h2>
+            <p>PHP cuenta con una gran cantidad de funciones nativas que facilitan el desarrollo. Aquí las más importantes y útiles para resolver problemas comunes.</p>
 
-        <section id="poo" class="section">
+            <h3>Funciones de Strings</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// Manipulación de strings
+$texto = "  hola mundo  ";
+echo strlen($texto); // 13 (longitud con espacios)
+echo trim($texto); // "hola mundo" (quita espacios)
+echo strtoupper($texto); // "  HOLA MUNDO  "
+echo strtolower($texto); // "  hola mundo  "
+echo ucfirst(trim($texto)); // "Hola mundo" (primera mayúscula)
+echo ucwords(trim($texto)); // "Hola Mundo" (cada palabra mayúscula)
+
+// Búsqueda y reemplazo
+$frase = "PHP es un lenguaje de programación";
+echo strpos($frase, "lenguaje"); // 11 (posición)
+echo str_replace("PHP", "JavaScript", $frase); // "JavaScript es un lenguaje..."
+echo substr($frase, 0, 3); // "PHP"
+
+// Validación
+echo filter_var("usuario@email.com", FILTER_VALIDATE_EMAIL) ? "Válido" : "Inválido";
+?&gt;</code></pre>
+            </div>
+
+            <h3>Funciones de Arrays</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+$numeros = [1, 2, 3, 4, 5];
+$frutas = ["manzana", "banana", "naranja"];
+
+// Agregar elementos
+array_push($numeros, 6, 7); // [1,2,3,4,5,6,7]
+$numeros[] = 8; // [1,2,3,4,5,6,7,8]
+
+// Eliminar elementos
+array_pop($numeros); // elimina último elemento
+array_shift($numeros); // elimina primer elemento
+
+// Búsqueda
+echo in_array(3, $numeros) ? "Encontrado" : "No encontrado"; // true
+echo array_search("banana", $frutas); // 1 (índice)
+
+// Ordenamiento
+sort($numeros); // orden ascendente
+rsort($numeros); // orden descendente
+asort($frutas); // orden alfabético manteniendo índices
+
+// Arrays asociativos
+$persona = ["nombre" => "Juan", "edad" => 25, "ciudad" => "Madrid"];
+echo array_key_exists("edad", $persona) ? "Clave existe" : "No existe";
+echo array_keys($persona); // ["nombre", "edad", "ciudad"]
+echo array_values($persona); // ["Juan", 25, "Madrid"]
+
+// Funciones de callback
+$numeros_pares = array_filter($numeros, function($n) { return $n % 2 == 0; });
+$cuadrados = array_map(function($n) { return $n * $n; }, $numeros);
+$suma = array_reduce($numeros, function($carry, $item) { return $carry + $item; }, 0);
+?&gt;</code></pre>
+            </div>
+
+            <h3>Funciones de Fechas y Tiempo</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// Fecha actual
+echo date("Y-m-d H:i:s"); // 2024-01-15 14:30:25
+echo date("d/m/Y"); // 15/01/2024
+
+// Timestamp
+echo time(); // segundos desde 1970
+echo strtotime("2024-12-25"); // timestamp de Navidad
+echo strtotime("+1 week"); // timestamp de una semana desde ahora
+
+// Formateo
+$fecha = strtotime("2024-01-15");
+echo date("l, F j, Y", $fecha); // Monday, January 15, 2024
+
+// Diferencia entre fechas
+$fecha1 = new DateTime("2024-01-01");
+$fecha2 = new DateTime("2024-12-31");
+$diferencia = $fecha1-&gt;diff($fecha2);
+echo $diferencia-&gt;days . " días"; // 365 días
+
+// Validación
+echo checkdate(2, 29, 2024) ? "Fecha válida" : "Fecha inválida"; // true (2024 es bisiesto)
+?&gt;</code></pre>
+            </div>
+
+            <h3>Funciones de Archivos</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// Leer archivos
+$contenido = file_get_contents("archivo.txt");
+$lineas = file("archivo.txt"); // array de líneas
+
+// Escribir archivos
+file_put_contents("nuevo.txt", "Contenido nuevo");
+file_put_contents("log.txt", "Nueva entrada\n", FILE_APPEND);
+
+// Verificar existencia
+echo file_exists("archivo.txt") ? "Existe" : "No existe";
+echo is_file("archivo.txt") ? "Es archivo" : "No es archivo";
+echo is_dir("carpeta") ? "Es directorio" : "No es directorio";
+
+// Información de archivos
+echo filesize("archivo.txt") . " bytes";
+echo filemtime("archivo.txt"); // timestamp de modificación
+echo pathinfo("ruta/archivo.txt", PATHINFO_EXTENSION); // "txt"
+
+// Directorios
+$archivos = scandir("carpeta"); // lista de archivos
+mkdir("nueva_carpeta");
+rmdir("carpeta_vacia");
+?&gt;</code></pre>
+            </div>
+
+            <h3>Funciones de Seguridad</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// Sanitización
+$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+$url = filter_var($_POST['url'], FILTER_SANITIZE_URL);
+$texto = filter_var($_POST['texto'], FILTER_SANITIZE_STRING);
+
+// Validación
+$email_valido = filter_var($email, FILTER_VALIDATE_EMAIL);
+$url_valida = filter_var($url, FILTER_VALIDATE_URL);
+
+// Password hashing
+$password = "mi_password";
+$hash = password_hash($password, PASSWORD_DEFAULT);
+echo password_verify($password, $hash) ? "Contraseña correcta" : "Incorrecta";
+
+// Escape de HTML
+$comentario = "&lt;script&gt;alert('XSS')&lt;/script&gt;";
+echo htmlspecialchars($comentario); // &lt;script&gt;alert('XSS')&lt;/script&gt;
+
+// Generar tokens seguros
+$token = bin2hex(random_bytes(32));
+session_start();
+$_SESSION['csrf_token'] = $token;
+?&gt;</code></pre>
+            </div>
+        </section>
             <h2>Programación Orientada a Objetos (POO)</h2>
             <h3>Clases y Objetos</h3>
             <div class="example">
@@ -169,9 +315,222 @@ echo $admin-&gt;getNombre(); // Heredado de Usuario
 echo $admin-&gt;banearUsuario(123);
 ?&gt;</code></pre>
             </div>
-        </section>
+        <section id="mvc" class="section">
+            <h2>Patrón MVC (Model-View-Controller)</h2>
+            <p>MVC es un patrón de arquitectura que separa la lógica de negocio (Model), la presentación (View) y el control de flujo (Controller). Es una buena práctica para mantener el código organizado y mantenible.</p>
 
-        <section id="mysqli" class="section">
+            <h3>¿Por qué usar MVC?</h3>
+            <ul>
+                <li><strong>Separación de responsabilidades:</strong> Cada componente tiene una función específica</li>
+                <li><strong>Mantenibilidad:</strong> Fácil modificar una parte sin afectar otras</li>
+                <li><strong>Reutilización:</strong> Los modelos pueden usarse en diferentes controladores</li>
+                <li><strong>Testabilidad:</strong> Cada componente puede probarse independientemente</li>
+                <li><strong>Escalabilidad:</strong> Fácil agregar nuevas funcionalidades</li>
+            </ul>
+
+            <h3>Estructura Básica de MVC</h3>
+            <div class="example">
+                <pre><code>// Estructura de directorios
+mi_proyecto/
+├── index.php          // Punto de entrada único
+├── .htaccess          // Reescritura de URLs
+├── controllers/       // Controladores
+│   ├── HomeController.php
+│   └── UserController.php
+├── models/           // Modelos
+│   ├── User.php
+│   └── Product.php
+├── views/            // Vistas
+│   ├── home/
+│   │   └── index.php
+│   └── user/
+│       ├── login.php
+│       └── profile.php
+└── core/             // Núcleo de la aplicación
+    ├── Database.php
+    ├── Controller.php
+    └── Model.php</code></pre>
+            </div>
+
+            <h3>Implementación Básica</h3>
+            <p><strong>1. Clase Base Controller</strong></p>
+            <div class="example">
+                <pre><code>&lt;?php
+// core/Controller.php
+class Controller {
+    protected function view($view, $data = []) {
+        // Extraer variables del array para usarlas en la vista
+        extract($data);
+        
+        // Incluir la vista
+        require_once "views/$view.php";
+    }
+    
+    protected function redirect($url) {
+        header("Location: $url");
+        exit;
+    }
+}
+?&gt;</code></pre>
+            </div>
+
+            <p><strong>2. Clase Base Model</strong></p>
+            <div class="example">
+                <pre><code>&lt;?php
+// core/Model.php
+class Model {
+    protected $db;
+    
+    public function __construct() {
+        $this-&gt;db = new PDO("mysql:host=localhost;dbname=mi_db", "usuario", "password");
+        $this-&gt;db-&gt;setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+}
+?&gt;</code></pre>
+            </div>
+
+            <p><strong>3. Modelo de Usuario</strong></p>
+            <div class="example">
+                <pre><code>&lt;?php
+// models/User.php
+class User extends Model {
+    public function getAll() {
+        $stmt = $this-&gt;db-&gt;query("SELECT * FROM users");
+        return $stmt-&gt;fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function getById($id) {
+        $stmt = $this-&gt;db-&gt;prepare("SELECT * FROM users WHERE id = ?");
+        $stmt-&gt;execute([$id]);
+        return $stmt-&gt;fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function create($data) {
+        $stmt = $this-&gt;db-&gt;prepare("INSERT INTO users (name, email) VALUES (?, ?)");
+        return $stmt-&gt;execute([$data['name'], $data['email']]);
+    }
+    
+    public function update($id, $data) {
+        $stmt = $this-&gt;db-&gt;prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
+        return $stmt-&gt;execute([$data['name'], $data['email'], $id]);
+    }
+    
+    public function delete($id) {
+        $stmt = $this-&gt;db-&gt;prepare("DELETE FROM users WHERE id = ?");
+        return $stmt-&gt;execute([$id]);
+    }
+}
+?&gt;</code></pre>
+            </div>
+
+            <p><strong>4. Controlador de Usuario</strong></p>
+            <div class="example">
+                <pre><code>&lt;?php
+// controllers/UserController.php
+class UserController extends Controller {
+    private $userModel;
+    
+    public function __construct() {
+        $this-&gt;userModel = new User();
+    }
+    
+    public function index() {
+        $users = $this-&gt;userModel-&gt;getAll();
+        $this-&gt;view('user/index', ['users' => $users]);
+    }
+    
+    public function show($id) {
+        $user = $this-&gt;userModel-&gt;getById($id);
+        if (!$user) {
+            $this-&gt;view('errors/404');
+            return;
+        }
+        $this-&gt;view('user/show', ['user' => $user]);
+    }
+    
+    public function create() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'],
+                'email' => $_POST['email']
+            ];
+            
+            if ($this-&gt;userModel-&gt;create($data)) {
+                $this-&gt;redirect('/users');
+            } else {
+                $this-&gt;view('user/create', ['error' => 'Error al crear usuario']);
+            }
+        } else {
+            $this-&gt;view('user/create');
+        }
+    }
+    
+    public function edit($id) {
+        $user = $this-&gt;userModel-&gt;getById($id);
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'],
+                'email' => $_POST['email']
+            ];
+            
+            if ($this-&gt;userModel-&gt;update($id, $data)) {
+                $this-&gt;redirect('/users');
+            }
+        }
+        
+        $this-&gt;view('user/edit', ['user' => $user]);
+    }
+    
+    public function delete($id) {
+        if ($this-&gt;userModel-&gt;delete($id)) {
+            $this-&gt;redirect('/users');
+        }
+    }
+}
+?&gt;</code></pre>
+            </div>
+
+            <p><strong>5. Vista de Lista de Usuarios</strong></p>
+            <div class="example">
+                <pre><code>&lt;!-- views/user/index.php --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Lista de Usuarios&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Usuarios&lt;/h1&gt;
+    &lt;a href="/users/create"&gt;Crear Nuevo Usuario&lt;/a&gt;
+    
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;ID&lt;/th&gt;
+                &lt;th&gt;Nombre&lt;/th&gt;
+                &lt;th&gt;Email&lt;/th&gt;
+                &lt;th&gt;Acciones&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;?php foreach ($users as $user): ?&gt;
+            &lt;tr&gt;
+                &lt;td&gt;&lt;?= $user['id'] ?&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;?= $user['name'] ?&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;?= $user['email'] ?&gt;&lt;/td&gt;
+                &lt;td&gt;
+                    &lt;a href="/users/show/&lt;?= $user['id'] ?&gt;"&gt;Ver&lt;/a&gt;
+                    &lt;a href="/users/edit/&lt;?= $user['id'] ?&gt;"&gt;Editar&lt;/a&gt;
+                    &lt;a href="/users/delete/&lt;?= $user['id'] ?&gt;" onclick="return confirm('¿Estás seguro?')"&gt;Eliminar&lt;/a&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;?php endforeach; ?&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+        </section>
             <h2>MySQL con MySQLi</h2>
             <h3>Conexión a la Base de Datos</h3>
             <div class="example">
@@ -223,9 +582,327 @@ $stmt-&gt;execute();
 $conexion-&gt;close();
 ?&gt;</code></pre>
             </div>
-        </section>
+        <section id="plantillas" class="section">
+            <h2>Sistema de Plantillas con Punto de Entrada Único</h2>
+            <p>Un sistema de plantillas permite separar la lógica de presentación, hacer el código más mantenible y crear URLs amigables. Usaremos un único index.php como punto de entrada y .htaccess para reescribir URLs.</p>
 
-        <section id="pdo" class="section">
+            <h3>Archivo .htaccess</h3>
+            <div class="example">
+                <pre><code># .htaccess
+RewriteEngine On
+
+# Evitar acceso directo a archivos sensibles
+RewriteRule ^(core|models|controllers)/ - [F,L]
+
+# Reescribir URLs amigables
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+# Seguridad adicional
+&lt;Files "config.php"&gt;
+    Order Deny,Allow
+    Deny from all
+&lt;/Files&gt;
+
+# Configuración de PHP
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300</code></pre>
+            </div>
+
+            <h3>Punto de Entrada Único (index.php)</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// index.php - Punto de entrada único
+
+// Iniciar sesión
+session_start();
+
+// Configuración de errores (solo en desarrollo)
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// Cargar configuración
+require_once 'config.php';
+
+// Autoloader simple para clases
+spl_autoload_register(function ($className) {
+    $paths = [
+        'core/',
+        'controllers/',
+        'models/'
+    ];
+    
+    foreach ($paths as $path) {
+        $file = $path . $className . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
+});
+
+// Función para obtener la URL actual
+function getCurrentUrl() {
+    $url = isset($_GET['url']) ? $_GET['url'] : 'home/index';
+    $url = rtrim($url, '/');
+    return explode('/', $url);
+}
+
+// Router simple
+$url = getCurrentUrl();
+$controller = isset($url[0]) ? ucfirst($url[0]) . 'Controller' : 'HomeController';
+$method = isset($url[1]) ? $url[1] : 'index';
+$params = array_slice($url, 2);
+
+// Verificar si el controlador existe
+if (class_exists($controller)) {
+    $controllerInstance = new $controller();
+    
+    // Verificar si el método existe
+    if (method_exists($controllerInstance, $method)) {
+        // Llamar al método con parámetros
+        call_user_func_array([$controllerInstance, $method], $params);
+    } else {
+        // Método no encontrado
+        require_once 'views/errors/404.php';
+    }
+} else {
+    // Controlador no encontrado
+    require_once 'views/errors/404.php';
+}
+?&gt;</code></pre>
+            </div>
+
+            <h3>Configuración (config.php)</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// config.php
+
+// Configuración de base de datos
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'mi_proyecto');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+
+// Configuración de la aplicación
+define('BASE_URL', 'http://localhost/mi_proyecto');
+define('APP_NAME', 'Mi Aplicación MVC');
+
+// Configuración de rutas
+define('ROOT_PATH', dirname(__FILE__));
+define('VIEW_PATH', ROOT_PATH . '/views/');
+define('CONTROLLER_PATH', ROOT_PATH . '/controllers/');
+define('MODEL_PATH', ROOT_PATH . '/models/');
+
+// Configuración de zona horaria
+date_default_timezone_set('America/Mexico_City');
+
+// Función helper para URLs
+function url($path = '') {
+    return BASE_URL . '/' . ltrim($path, '/');
+}
+
+// Función helper para assets
+function asset($path) {
+    return BASE_URL . '/assets/' . ltrim($path, '/');
+}
+?&gt;</code></pre>
+            </div>
+
+            <h3>Controlador Base Mejorado</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// core/Controller.php
+class Controller {
+    protected $layout = 'layouts/main';
+    
+    protected function view($view, $data = [], $layout = null) {
+        // Extraer variables del array para usarlas en la vista
+        extract($data);
+        
+        // Usar layout si se especifica
+        $layout = $layout ?? $this-&gt;layout;
+        
+        // Iniciar buffer de salida
+        ob_start();
+        require_once VIEW_PATH . $view . '.php';
+        $content = ob_get_clean();
+        
+        // Incluir layout si existe
+        if (file_exists(VIEW_PATH . $layout . '.php')) {
+            require_once VIEW_PATH . $layout . '.php';
+        } else {
+            echo $content;
+        }
+    }
+    
+    protected function json($data) {
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
+    
+    protected function redirect($url, $statusCode = 302) {
+        header('Location: ' . url($url), true, $statusCode);
+        exit;
+    }
+    
+    protected function isPost() {
+        return $_SERVER['REQUEST_METHOD'] === 'POST';
+    }
+    
+    protected function isAjax() {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+    
+    protected function getPost($key = null, $default = null) {
+        if ($key === null) {
+            return $_POST;
+        }
+        return isset($_POST[$key]) ? $_POST[$key] : $default;
+    }
+    
+    protected function getGet($key = null, $default = null) {
+        if ($key === null) {
+            return $_GET;
+        }
+        return isset($_GET[$key]) ? $_GET[$key] : $default;
+    }
+    
+    protected function setFlash($message, $type = 'info') {
+        $_SESSION['flash'] = [
+            'message' => $message,
+            'type' => $type
+        ];
+    }
+    
+    protected function getFlash() {
+        if (isset($_SESSION['flash'])) {
+            $flash = $_SESSION['flash'];
+            unset($_SESSION['flash']);
+            return $flash;
+        }
+        return null;
+    }
+}
+?&gt;</code></pre>
+            </div>
+
+            <h3>Layout Principal</h3>
+            <div class="example">
+                <pre><code>&lt;!-- views/layouts/main.php --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;&lt;?= $title ?? APP_NAME ?&gt;&lt;/title&gt;
+    
+    &lt;!-- Bootstrap CSS --&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+    
+    &lt;!-- CSS personalizado --&gt;
+    &lt;link rel="stylesheet" href="&lt;?= asset('css/style.css') ?&gt;"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark"&gt;
+        &lt;div class="container"&gt;
+            &lt;a class="navbar-brand" href="&lt;?= url() ?&gt;"&gt;&lt;?= APP_NAME ?&gt;&lt;/a&gt;
+            
+            &lt;div class="navbar-nav ms-auto"&gt;
+                &lt;a class="nav-link" href="&lt;?= url('home') ?&gt;"&gt;Inicio&lt;/a&gt;
+                &lt;a class="nav-link" href="&lt;?= url('users') ?&gt;"&gt;Usuarios&lt;/a&gt;
+                &lt;a class="nav-link" href="&lt;?= url('products') ?&gt;"&gt;Productos&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+    
+    &lt;main class="container mt-4"&gt;
+        &lt;!-- Mostrar mensajes flash --&gt;
+        &lt;?php $flash = $this-&gt;getFlash(); ?&gt;
+        &lt;?php if ($flash): ?&gt;
+            &lt;div class="alert alert-&lt;?= $flash['type'] ?&gt; alert-dismissible fade show" role="alert"&gt;
+                &lt;?= $flash['message'] ?&gt;
+                &lt;button type="button" class="btn-close" data-bs-dismiss="alert"&gt;&lt;/button&gt;
+            &lt;/div&gt;
+        &lt;?php endif; ?&gt;
+        
+        &lt;!-- Contenido de la vista --&gt;
+        &lt;?= $content ?? '' ?&gt;
+    &lt;/main&gt;
+    
+    &lt;!-- Bootstrap JS --&gt;
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+    
+    &lt;!-- JS personalizado --&gt;
+    &lt;script src="&lt;?= asset('js/app.js') ?&gt;"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+
+            <h3>Ejemplo de Controlador con Sistema de Plantillas</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// controllers/ProductController.php
+class ProductController extends Controller {
+    private $productModel;
+    
+    public function __construct() {
+        $this-&gt;productModel = new Product();
+    }
+    
+    public function index() {
+        $products = $this-&gt;productModel-&gt;getAll();
+        
+        $this-&gt;view('products/index', [
+            'title' => 'Lista de Productos',
+            'products' => $products
+        ]);
+    }
+    
+    public function create() {
+        if ($this-&gt;isPost()) {
+            $data = [
+                'name' => $this-&gt;getPost('name'),
+                'price' => $this-&gt;getPost('price'),
+                'description' => $this-&gt;getPost('description')
+            ];
+            
+            if ($this-&gt;productModel-&gt;create($data)) {
+                $this-&gt;setFlash('Producto creado exitosamente', 'success');
+                $this-&gt;redirect('products');
+            } else {
+                $this-&gt;setFlash('Error al crear el producto', 'danger');
+            }
+        }
+        
+        $this-&gt;view('products/create', [
+            'title' => 'Crear Producto'
+        ]);
+    }
+    
+    public function api() {
+        // Respuesta JSON para AJAX
+        $products = $this-&gt;productModel-&gt;getAll();
+        $this-&gt;json(['success' => true, 'data' => $products]);
+    }
+}
+?&gt;</code></pre>
+            </div>
+
+            <h3>Ventajas del Sistema</h3>
+            <ul>
+                <li><strong>URLs amigables:</strong> /products/create en lugar de index.php?controller=products&action=create</li>
+                <li><strong>Separación clara:</strong> Lógica, presentación y datos separados</li>
+                <li><strong>Reutilización:</strong> Layouts y componentes compartidos</li>
+                <li><strong>SEO-friendly:</strong> URLs limpias y estructuradas</li>
+                <li><strong>Mantenibilidad:</strong> Cambios en un lugar afectan globalmente</li>
+                <li><strong>Seguridad:</strong> Archivos sensibles protegidos del acceso directo</li>
+            </ul>
+        </section>
             <h2>MySQL con PDO</h2>
             <h3>Conexión PDO</h3>
             <div class="example">
