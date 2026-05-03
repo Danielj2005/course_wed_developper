@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL, MySQL y PostgreSQL - Guía Completa</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: #28a745; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #28a745; padding-left: 10px; margin: 10px 0; }
+        .mysql { background-color: #fff3cd; border-left-color: #ffc107; }
+        .postgres { background-color: #d1ecf1; border-left-color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#sql">SQL Básico</a>
+            <a href="#mysql">MySQL</a>
+            <a href="#postgresql">PostgreSQL</a>
+            <a href="#ejemplos">Ejemplos</a>
+        </div>
+
+        <h1>🗄️ SQL, MySQL y PostgreSQL - Guía Completa</h1>
+        
+        <section id="intro" class="section">
+            <h2>Introducción a las Bases de Datos</h2>
+            <p>Las bases de datos son sistemas organizados para almacenar, gestionar y recuperar información. SQL es el lenguaje estándar para interactuar con bases de datos relacionales.</p>
+            <h3>¿Qué aprenderás?</h3>
+            <ul>
+                <li>Conceptos fundamentales de SQL</li>
+                <li>DDL (Data Definition Language)</li>
+                <li>DML (Data Manipulation Language)</li>
+                <li>DCL (Data Control Language)</li>
+                <li>Funciones y procedimientos almacenados</li>
+                <li>Optimización y mejores prácticas</li>
+                <li>Diferencias entre MySQL y PostgreSQL</li>
+            </ul>
+        </section>
+
+        <section id="sql" class="section">
+            <h2>SQL Básico</h2>
+            <h3>Crear Tabla</h3>
+            <div class="example">
+                <pre><code>CREATE TABLE usuarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    activo BOOLEAN DEFAULT TRUE
+);</code></pre>
+            </div>
+
+            <h3>Insertar Datos</h3>
+            <div class="example">
+                <pre><code>INSERT INTO usuarios (nombre, email) 
+VALUES ('Juan Pérez', 'juan@email.com'),
+       ('María García', 'maria@email.com'),
+       ('Carlos López', 'carlos@email.com');</code></pre>
+            </div>
+
+            <h3>Consultar Datos</h3>
+            <div class="example">
+                <pre><code>-- Seleccionar todos los usuarios
+SELECT * FROM usuarios;
+
+-- Seleccionar campos específicos
+SELECT nombre, email FROM usuarios WHERE activo = TRUE;
+
+-- Con JOIN
+SELECT u.nombre, p.titulo 
+FROM usuarios u 
+JOIN posts p ON u.id = p.usuario_id;
+
+-- Con agrupación
+SELECT COUNT(*) as total, activo 
+FROM usuarios 
+GROUP BY activo;</code></pre>
+            </div>
+
+            <h3>Actualizar y Eliminar</h3>
+            <div class="example">
+                <pre><code>-- Actualizar
+UPDATE usuarios 
+SET nombre = 'Juan Carlos Pérez', email = 'juancarlos@email.com' 
+WHERE id = 1;
+
+-- Eliminar
+DELETE FROM usuarios WHERE id = 3;</code></pre>
+            </div>
+
+            <h3>Funciones Agregadas</h3>
+            <div class="example">
+                <pre><code>SELECT 
+    COUNT(*) as total_usuarios,
+    AVG(edad) as edad_promedio,
+    MAX(fecha_registro) as ultimo_registro,
+    MIN(fecha_registro) as primer_registro
+FROM usuarios;</code></pre>
+            </div>
+        </section>
+
+        <section id="mysql" class="section">
+            <h2>MySQL</h2>
+            <p>MySQL es uno de los sistemas de gestión de bases de datos más populares, conocido por su velocidad y facilidad de uso.</p>
+            
+            <h3>Características Específicas de MySQL</h3>
+            <div class="example mysql">
+                <pre><code>-- Tipos de datos específicos
+CREATE TABLE productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    descripcion TEXT,
+    imagen LONGBLOB,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices
+CREATE INDEX idx_nombre ON productos (nombre);
+CREATE FULLTEXT INDEX idx_descripcion ON productos (descripcion);
+
+-- Motores de almacenamiento
+CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mensaje TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE = MyISAM;
+
+-- Procedimientos almacenados
+DELIMITER //
+CREATE PROCEDURE obtener_usuario(IN user_id INT)
+BEGIN
+    SELECT * FROM usuarios WHERE id = user_id;
+END //
+DELIMITER ;
+
+-- Triggers
+DELIMITER //
+CREATE TRIGGER actualizar_fecha_modificacion 
+BEFORE UPDATE ON usuarios
+FOR EACH ROW
+BEGIN
+    SET NEW.fecha_modificacion = NOW();
+END //
+DELIMITER ;</code></pre>
+            </div>
+
+            <h3>Optimización en MySQL</h3>
+            <ul>
+                <li>Usar EXPLAIN para analizar consultas</li>
+                <li>Crear índices apropiados</li>
+                <li>Usar LIMIT en consultas grandes</li>
+                <li>Normalizar tablas cuando sea necesario</li>
+                <li>Usar prepared statements</li>
+            </ul>
+        </section>
+
+        <section id="postgresql" class="section">
+            <h2>PostgreSQL</h2>
+            <p>PostgreSQL es un sistema de gestión de bases de datos objeto-relacional avanzado, conocido por su robustez y cumplimiento de estándares SQL.</p>
+            
+            <h3>Características Avanzadas de PostgreSQL</h3>
+            <div class="example postgres">
+                <pre><code>-- Tipos de datos avanzados
+CREATE TABLE documentos (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    contenido TEXT,
+    metadata JSONB,
+    ubicacion GEOMETRY,
+    etiquetas TEXT[],
+    fecha_creacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Arrays
+INSERT INTO documentos (titulo, etiquetas) 
+VALUES ('Documento 1', ARRAY['importante', 'urgente']);
+
+-- JSONB
+UPDATE documentos 
+SET metadata = '{"autor": "Juan", "version": 1.2, "revisado": true}'
+WHERE id = 1;
+
+-- Consultas JSON
+SELECT titulo, metadata-&gt;'autor' as autor 
+FROM documentos 
+WHERE metadata-&gt;&gt;'revisado' = 'true';
+
+-- Funciones avanzadas
+CREATE OR REPLACE FUNCTION calcular_promedio_notas()
+RETURNS DECIMAL AS $$
+DECLARE
+    promedio DECIMAL;
+BEGIN
+    SELECT AVG(nota) INTO promedio FROM calificaciones;
+    RETURN promedio;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Triggers con funciones
+CREATE OR REPLACE FUNCTION actualizar_promedio()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE estudiantes 
+    SET promedio = calcular_promedio_notas()
+    WHERE id = NEW.estudiante_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_actualizar_promedio
+    AFTER INSERT OR UPDATE ON calificaciones
+    FOR EACH ROW EXECUTE FUNCTION actualizar_promedio();</code></pre>
+            </div>
+
+            <h3>Ventajas de PostgreSQL</h3>
+            <ul>
+                <li>Tipos de datos avanzados (JSONB, arrays, geometría)</li>
+                <li>Mejor soporte para transacciones complejas</li>
+                <li>Extensiones poderosas</li>
+                <li>Mejor cumplimiento de estándares SQL</li>
+                <li>Soporte nativo para UUID, rangos, etc.</li>
+            </ul>
+        </section>
+
+        <section id="ejemplos" class="section">
+            <h2>Ejemplos Prácticos</h2>
+            
+            <h3>E-commerce: Sistema de Productos y Pedidos</h3>
+            <div class="example">
+                <pre><code>-- Tabla de productos
+CREATE TABLE productos (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion TEXT,
+    precio DECIMAL(10,2) NOT NULL,
+    stock INT DEFAULT 0,
+    categoria_id INT REFERENCES categorias(id)
+);
+
+-- Tabla de pedidos
+CREATE TABLE pedidos (
+    id SERIAL PRIMARY KEY,
+    usuario_id INT REFERENCES usuarios(id),
+    fecha_pedido TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    estado VARCHAR(50) DEFAULT 'pendiente',
+    total DECIMAL(10,2)
+);
+
+-- Tabla de detalle de pedidos
+CREATE TABLE pedido_detalles (
+    id SERIAL PRIMARY KEY,
+    pedido_id INT REFERENCES pedidos(id),
+    producto_id INT REFERENCES productos(id),
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL
+);
+
+-- Consulta compleja
+SELECT 
+    p.id,
+    p.nombre,
+    SUM(pd.cantidad) as total_vendido,
+    SUM(pd.cantidad * pd.precio_unitario) as ingresos
+FROM productos p
+JOIN pedido_detalles pd ON p.id = pd.producto_id
+JOIN pedidos pe ON pd.pedido_id = pe.id
+WHERE pe.fecha_pedido >= '2024-01-01'
+GROUP BY p.id, p.nombre
+ORDER BY ingresos DESC;</code></pre>
+            </div>
+
+            <h3>Blog: Sistema de Artículos y Comentarios</h3>
+            <div class="example">
+                <pre><code>-- Tabla de artículos
+CREATE TABLE articulos (
+    id SERIAL PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    contenido TEXT NOT NULL,
+    autor_id INT REFERENCES usuarios(id),
+    fecha_publicacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    publicado BOOLEAN DEFAULT FALSE
+);
+
+-- Tabla de comentarios
+CREATE TABLE comentarios (
+    id SERIAL PRIMARY KEY,
+    articulo_id INT REFERENCES articulos(id),
+    usuario_id INT REFERENCES usuarios(id),
+    contenido TEXT NOT NULL,
+    fecha_comentario TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Vista para artículos publicados con comentarios
+CREATE VIEW articulos_comentarios AS
+SELECT 
+    a.id,
+    a.titulo,
+    a.fecha_publicacion,
+    u.nombre as autor,
+    COUNT(c.id) as num_comentarios
+FROM articulos a
+JOIN usuarios u ON a.autor_id = u.id
+LEFT JOIN comentarios c ON a.id = c.articulo_id
+WHERE a.publicado = TRUE
+GROUP BY a.id, a.titulo, a.fecha_publicacion, u.nombre;</code></pre>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

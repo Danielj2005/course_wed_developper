@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP desde Cero - Curso Full Stack</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: #007bff; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #007bff; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#fundamentos">Fundamentos</a>
+            <a href="#poo">POO</a>
+            <a href="#mysqli">MySQLi</a>
+            <a href="#pdo">PDO</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>🚀 PHP desde Cero - Desarrollo Full Stack</h1>
+        
+        <section id="intro" class="section">
+            <h2>Introducción a PHP</h2>
+            <p>PHP es un lenguaje de scripting del lado del servidor diseñado principalmente para el desarrollo web. Es uno de los lenguajes más populares para crear aplicaciones web dinámicas.</p>
+            <h3>¿Qué aprenderás?</h3>
+            <ul>
+                <li>Sintaxis básica y variables</li>
+                <li>Estructuras de control</li>
+                <li>Funciones y arrays</li>
+                <li>Programación Orientada a Objetos</li>
+                <li>Manejo de bases de datos (MySQLi y PDO)</li>
+                <li>Seguridad y mejores prácticas</li>
+                <li>Proyectos prácticos</li>
+            </ul>
+        </section>
+
+        <section id="fundamentos" class="section">
+            <h2>Fundamentos de PHP</h2>
+            <h3>Variables y Tipos de Datos</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// Variables
+$nombre = "Juan";
+$edad = 25;
+$precio = 99.99;
+$activo = true;
+
+// Arrays
+$frutas = array("manzana", "banana", "naranja");
+$persona = ["nombre" => "Ana", "edad" => 30];
+
+// Constantes
+define("PI", 3.14159);
+const VERSION = "1.0";
+?&gt;</code></pre>
+            </div>
+
+            <h3>Estructuras de Control</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// Condicionales
+if ($edad >= 18) {
+    echo "Mayor de edad";
+} elseif ($edad >= 13) {
+    echo "Adolescente";
+} else {
+    echo "Menor de edad";
+}
+
+// Bucles
+for ($i = 0; $i < 5; $i++) {
+    echo "Número: $i&lt;br&gt;";
+}
+
+foreach ($frutas as $fruta) {
+    echo "Fruta: $fruta&lt;br&gt;";
+}
+?&gt;</code></pre>
+            </div>
+
+            <h3>Funciones</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+function saludar($nombre) {
+    return "Hola, $nombre!";
+}
+
+function calcularArea($base, $altura) {
+    return ($base * $altura) / 2;
+}
+
+// Función con parámetros por defecto
+function crearUsuario($nombre, $email, $activo = true) {
+    // Lógica para crear usuario
+    return ["nombre" => $nombre, "email" => $email, "activo" => $activo];
+}
+
+echo saludar("María");
+?&gt;</code></pre>
+            </div>
+        </section>
+
+        <section id="poo" class="section">
+            <h2>Programación Orientada a Objetos (POO)</h2>
+            <h3>Clases y Objetos</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+class Usuario {
+    // Propiedades
+    public $nombre;
+    public $email;
+    private $password;
+    protected $rol;
+
+    // Constructor
+    public function __construct($nombre, $email, $password) {
+        $this-&gt;nombre = $nombre;
+        $this-&gt;email = $email;
+        $this-&gt;setPassword($password);
+    }
+
+    // Métodos
+    public function getNombre() {
+        return $this-&gt;nombre;
+    }
+
+    public function setPassword($password) {
+        $this-&gt;password = password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    public function verificarPassword($password) {
+        return password_verify($password, $this-&gt;password);
+    }
+}
+
+// Crear objeto
+$usuario = new Usuario("Juan Pérez", "juan@email.com", "123456");
+echo $usuario-&gt;getNombre();
+?&gt;</code></pre>
+            </div>
+
+            <h3>Herencia</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+class Administrador extends Usuario {
+    public function __construct($nombre, $email, $password) {
+        parent::__construct($nombre, $email, $password);
+        $this-&gt;rol = "admin";
+    }
+
+    public function banearUsuario($usuarioId) {
+        // Lógica para banear usuario
+        return "Usuario $usuarioId baneado";
+    }
+}
+
+$admin = new Administrador("Admin", "admin@email.com", "admin123");
+echo $admin-&gt;getNombre(); // Heredado de Usuario
+echo $admin-&gt;banearUsuario(123);
+?&gt;</code></pre>
+            </div>
+        </section>
+
+        <section id="mysqli" class="section">
+            <h2>MySQL con MySQLi</h2>
+            <h3>Conexión a la Base de Datos</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// Conexión
+$conexion = new mysqli("localhost", "usuario", "password", "base_datos");
+
+// Verificar conexión
+if ($conexion-&gt;connect_error) {
+    die("Error de conexión: " . $conexion-&gt;connect_error);
+}
+
+// Configurar charset
+$conexion-&gt;set_charset("utf8");
+?&gt;</code></pre>
+            </div>
+
+            <h3>Consultas Básicas</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// INSERT
+$sql = "INSERT INTO usuarios (nombre, email) VALUES (?, ?)";
+$stmt = $conexion-&gt;prepare($sql);
+$stmt-&gt;bind_param("ss", $nombre, $email);
+$stmt-&gt;execute();
+
+// SELECT
+$sql = "SELECT id, nombre, email FROM usuarios WHERE activo = 1";
+$resultado = $conexion-&gt;query($sql);
+
+if ($resultado-&gt;num_rows > 0) {
+    while($fila = $resultado-&gt;fetch_assoc()) {
+        echo "ID: " . $fila["id"] . " - Nombre: " . $fila["nombre"] . "&lt;br&gt;";
+    }
+}
+
+// UPDATE
+$sql = "UPDATE usuarios SET nombre = ? WHERE id = ?";
+$stmt = $conexion-&gt;prepare($sql);
+$stmt-&gt;bind_param("si", $nuevoNombre, $id);
+$stmt-&gt;execute();
+
+// DELETE
+$sql = "DELETE FROM usuarios WHERE id = ?";
+$stmt = $conexion-&gt;prepare($sql);
+$stmt-&gt;bind_param("i", $id);
+$stmt-&gt;execute();
+
+$conexion-&gt;close();
+?&gt;</code></pre>
+            </div>
+        </section>
+
+        <section id="pdo" class="section">
+            <h2>MySQL con PDO</h2>
+            <h3>Conexión PDO</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+try {
+    $pdo = new PDO("mysql:host=localhost;dbname=base_datos;charset=utf8", "usuario", "password");
+    $pdo-&gt;setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("Error de conexión: " . $e-&gt;getMessage());
+}
+?&gt;</code></pre>
+            </div>
+
+            <h3>Operaciones CRUD con PDO</h3>
+            <div class="example">
+                <pre><code>&lt;?php
+// INSERT
+$sql = "INSERT INTO usuarios (nombre, email, fecha_registro) VALUES (:nombre, :email, NOW())";
+$stmt = $pdo-&gt;prepare($sql);
+$stmt-&gt;execute([
+    'nombre' => $nombre,
+    'email' => $email
+]);
+
+// SELECT
+$sql = "SELECT * FROM usuarios WHERE activo = :activo ORDER BY fecha_registro DESC";
+$stmt = $pdo-&gt;prepare($sql);
+$stmt-&gt;execute(['activo' => 1]);
+$usuarios = $stmt-&gt;fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($usuarios as $usuario) {
+    echo $usuario['nombre'] . "&lt;br&gt;";
+}
+
+// UPDATE
+$sql = "UPDATE usuarios SET nombre = :nombre WHERE id = :id";
+$stmt = $pdo-&gt;prepare($sql);
+$stmt-&gt;execute([
+    'nombre' => $nuevoNombre,
+    'id' => $id
+]);
+
+// DELETE
+$sql = "DELETE FROM usuarios WHERE id = :id";
+$stmt = $pdo-&gt;prepare($sql);
+$stmt-&gt;execute(['id' => $id]);
+?&gt;</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Prácticos</h2>
+            <h3>Sistema de Login</h3>
+            <p>Crea un sistema completo de autenticación con registro, login y logout.</p>
+            
+            <h3>CRUD de Productos</h3>
+            <p>Aplicación para gestionar productos con operaciones Create, Read, Update, Delete.</p>
+            
+            <h3>Blog Personal</h3>
+            <p>Sistema de blog con categorías, comentarios y panel de administración.</p>
+            
+            <h3>API REST</h3>
+            <p>Construye una API RESTful para servir datos a aplicaciones frontend.</p>
+        </section>
+    </div>
+</body>
+</html>
