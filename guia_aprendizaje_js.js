@@ -48,7 +48,69 @@ const valoresFalsy = [false, 0, "", null, undefined, NaN];
 
 // -------------------------------------------------------------
 // TODO 3. Operadores básicos
-// ------------------------------------------------
+// -------------------------------------------------------------
+
+// TODO Operador	Descripción
+//    +	      Suma
+//    -	      Resta
+//    *	      Multiplicación
+//    /	      División	
+//    %	      Módulo 
+//    **	    Potencia
+//    ++	    Incrementoués)
+//    --	    Decremento
+
+// TODO Operadores de asignación
+// Asignan valores a variables.
+
+// Operador	Ejemplo	      Equivalente a
+//    =	      x = y	        x toma el valor de y
+//    +=	    x += y	      x = x + y
+//    -=	    x -= y	      x = x - y
+//    *=	    x *= y	      x = x * y
+//    /=	    x /= y	      x = x / y
+//    %=	    x %= y	      x = x % y
+//    **=	    x **= y	      x = x ** y
+
+// TODO Operadores de comparación
+// Devuelven true o false.
+// Operador	      Descripción	          Ejemplo (x=5, y="5")	    Resultado
+//    ==	      Igualdad (sin tipo)	      x == y	true
+//    ===	      Igualdad estricta	        x === y	false
+//    !=	      Desigualdad (sin tipo)	  x != y	false
+//    !==	      Desigualdad estricta	    x !== y	true
+//    >	        Mayor que	                x > 3	true
+//    <	        Menor que	                x < 3	false
+//    >=	      Mayor o igual	            x >= 5	true
+//    <=	      Menor o igual	            x <= 5	true
+
+// TODO Operadores lógicos
+// Trabajan con valores booleanos.
+// Operador	   Descripción	      Ejemplo	            Resultado
+//    &&	      AND lógico	      true && false	        false
+//    ||	      OR lógico	        true || false	        true
+//    !	        NOT lógico	       !true	              false
+
+
+// TODO Operadores bit a bit (bitwise)
+// Operan a nivel de bits.
+// Operador	 |           Descripción	             |Ejemplo (5=0101, 1=0001)|	      Resultado
+//    &	     |             AND	                   |   5 & 1 → 0001	        |           1
+//    |	     |             OR	                     | 5 | 1 → 0101	          |           5
+//    ^	     |             XOR	                   |   5 ^ 1 → 0100	        |           4
+//    ~	     |             NOT	                   |   ~5 → ...1010	        |           -6
+//    <<	   | Desplaza a la izquierda	           |   5 << 1	              |           10
+//    >>	   | Desplaza a la derecha con signo	   |   5 >> 1	              |           2
+//    >>>	   | Desplaza a la derecha sin signo	   |   5 >>> 1	            |           2
+
+
+// TODO Otros operadores útiles
+// Ternario: 2 < 5 ? "verdadero" : "falso"
+// typeof: Devuelve el tipo de dato → typeof 42 → "number"
+// instanceof: Comprueba si un objeto es instancia de una clase → obj instanceof Array
+// delete: Elimina una propiedad de un objeto → delete obj.prop
+// in: Comprueba si una propiedad existe en un objeto → "prop" in obj
+
 const suma = 10 + 5;
 const resta = 10 - 5;
 const multiplicacion = 10 * 5;
