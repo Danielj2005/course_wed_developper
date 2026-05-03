@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía y Ejemplos de JavaScript</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: blue;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .item {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="titulo">Título Original</h1>
+    <p>Este es un párrafo de ejemplo.</p>
+    <button id="miBoton">Haz clic aquí</button>
+    <div class="item" style="width: fit-content;">Elemento 1</div>
+    <div class="item" style="width: fit-content;">Elemento 2</div>
+    <div class="item" style="width: fit-content;">Elemento 3</div>
+
+    <h2>Ejemplos en Consola</h2>
+    <p>Abre la consola del navegador (F12) para ver los ejemplos ejecutándose.</p>
+
+    <!-- Conectar los archivos JavaScript -->
+    <script>
+                
+        // Selección de elementos: Encontrar partes de la página.
+        // document.querySelector: Selecciona el primer elemento que coincide con un selector CSS.
+        const titulo = document.querySelector("h1");
+        // document.getElementById: Selecciona un elemento por su ID.
+        const boton = document.getElementById("miBoton");
+        // document.querySelectorAll: Selecciona todos los elementos que coinciden.
+        const elementos = document.querySelectorAll(".item");
+
+        // Texto y contenido:
+        // textContent: Cambia o lee el texto plano.
+        titulo.textContent = "Nuevo título";
+        // innerHTML: Cambia o lee el HTML interno (cuidado con seguridad).
+        titulo.innerHTML = "<strong>Texto con formato</strong>";
+
+        // Atributos y clases:
+        // setAttribute: Agrega o cambia un atributo.
+        boton.setAttribute("data-accion", "guardar");
+        // classList: Maneja clases CSS.
+        boton.classList.add("activo");
+        boton.classList.remove("desactivado");
+
+        // Estilos directos: Cambiar CSS directamente.
+        // Se usa para cambios rápidos, pero mejor usar clases CSS.
+        titulo.style.color = "blue";
+        titulo.style.fontSize = "24px";
+
+        // Crear elementos: Agregar nuevos elementos a la página.
+        // createElement: Crea un nuevo elemento HTML.
+        const nuevoParrafo = document.createElement("p");
+        nuevoParrafo.textContent = "Este párrafo se creó con JavaScript.";
+        // appendChild: Agrega el elemento al final del body.
+        document.body.appendChild(nuevoParrafo);
+
+        // Eventos: Responder a acciones del usuario.
+        // addEventListener: Escucha eventos como clicks.
+        boton.addEventListener("click", (evento) => {
+            evento.preventDefault(); // Previene el comportamiento por defecto.
+            console.log("Botón presionado");
+        });
+
+    </script>
+</body>
+</html>
