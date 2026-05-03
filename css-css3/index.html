@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Completa de CSS y CSS3</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .section { margin-bottom: 40px; }
+        .code-example { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        pre { margin: 0; }
+        .demo-box {
+            width: 100px;
+            height: 100px;
+            background: #007bff;
+            margin: 10px;
+            display: inline-block;
+        }
+        .flex-demo {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 150px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin: 10px 0;
+        }
+        .grid-demo {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            height: 150px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin: 10px 0;
+        }
+        .grid-item {
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="text-center mb-5">
+            <h1>Guía Completa de CSS y CSS3</h1>
+            <p class="lead">Domina los estilos web con mejores prácticas y técnicas modernas</p>
+        </header>
+
+        <section class="section">
+            <h2>1. ¿Qué es CSS?</h2>
+            <p>CSS (Cascading Style Sheets) es el lenguaje que da estilo y diseño a las páginas web. Controla colores, fuentes, layouts y animaciones.</p>
+            <p><strong>Importante:</strong> CSS separa el contenido (HTML) del diseño, haciendo el código más mantenible y reutilizable.</p>
+
+            <h3>Formas de aplicar CSS:</h3>
+            <ul>
+                <li><strong>Inline:</strong> Directamente en la etiqueta HTML (no recomendado)</li>
+                <li><strong>Interno:</strong> En la etiqueta &lt;style&gt; del head</li>
+                <li><strong>Externo:</strong> Archivo .css separado (recomendado)</li>
+            </ul>
+
+            <div class="code-example">
+                <pre><code>&lt;!-- CSS Externo (recomendado) --&gt;
+&lt;link rel="stylesheet" href="styles.css"&gt;
+
+&lt;!-- CSS Interno --&gt;
+&lt;style&gt;
+    body { background: #f0f0f0; }
+&lt;/style&gt;
+
+&lt;!-- CSS Inline (evitar) --&gt;
+&lt;p style="color: red;"&gt;Texto rojo&lt;/p&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>2. Selectores CSS</h2>
+            <p>Los selectores indican qué elementos HTML estilizar.</p>
+
+            <h3>Selectores básicos:</h3>
+            <div class="code-example">
+                <pre><code>/* Selector de etiqueta */
+p { color: blue; }
+
+/* Selector de clase */
+.mi-clase { font-size: 18px; }
+
+/* Selector de ID */
+#mi-id { background: yellow; }
+
+/* Selector universal */
+* { margin: 0; }</code></pre>
+            </div>
+
+            <h3>Selectores avanzados:</h3>
+            <div class="code-example">
+                <pre><code>/* Selector descendente */
+div p { color: green; }
+
+/* Selector de hijo directo */
+div > p { font-weight: bold; }
+
+/* Selector de hermano adyacente */
+h1 + p { margin-top: 0; }
+
+/* Selector de atributo */
+input[type="text"] { border: 1px solid #ccc; }
+
+/* Pseudo-clases */
+a:hover { color: red; }
+li:nth-child(even) { background: #f0f0f0; }
+
+/* Pseudo-elementos */
+p::first-letter { font-size: 2em; }
+div::before { content: "→"; }</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>3. Modelo de Caja (Box Model)</h2>
+            <p>Todo elemento HTML es una caja rectangular con contenido, padding, borde y margin.</p>
+
+            <div style="border: 2px solid #007bff; padding: 20px; margin: 20px; background: #e7f3ff;">
+                <div style="border: 2px solid #28a745; padding: 10px; background: #d4edda;">
+                    <p style="margin: 0; background: #fff3cd; padding: 5px;">Contenido</p>
+                </div>
+            </div>
+
+            <div class="code-example">
+                <pre><code>.caja {
+    width: 200px;
+    height: 100px;
+    padding: 20px;        /* Espacio interno */
+    border: 2px solid #000; /* Borde */
+    margin: 10px;         /* Espacio externo */
+    background: lightblue;
+}
+
+/* Box-sizing: border-box incluye padding y borde en el ancho total */
+.caja-moderna {
+    box-sizing: border-box;
+    width: 200px;
+    padding: 20px;
+    border: 2px solid #000;
+}</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>4. Posicionamiento</h2>
+
+            <h3>Position:</h3>
+            <div class="code-example">
+                <pre><code>/* Static: posición normal (default) */
+.static { position: static; }
+
+/* Relative: relativo a su posición normal */
+.relative {
+    position: relative;
+    top: 10px;
+    left: 20px;
+}
+
+/* Absolute: relativo al ancestro posicionado más cercano */
+.absolute {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/* Fixed: fijo en la ventana del navegador */
+.fixed {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
+
+/* Sticky: se pega al hacer scroll */
+.sticky {
+    position: sticky;
+    top: 0;
+}</code></pre>
+            </div>
+
+            <h3>Float y Clear:</h3>
+            <div class="code-example">
+                <pre><code>.izquierda { float: left; width: 50%; }
+.derecha { float: right; width: 50%; }
+
+/* Limpiar floats */
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>5. Flexbox</h2>
+            <p>Flexbox es un modelo de layout moderno para crear diseños flexibles.</p>
+
+            <div class="flex-demo">
+                <div class="demo-box"></div>
+                <div class="demo-box"></div>
+                <div class="demo-box"></div>
+            </div>
+
+            <div class="code-example">
+                <pre><code>.contenedor-flex {
+    display: flex;
+    justify-content: space-between; /* Alineación horizontal */
+    align-items: center;           /* Alineación vertical */
+    flex-wrap: wrap;               /* Envolver elementos */
+}
+
+.item-flex {
+    flex: 1;                       /* Crecer para ocupar espacio */
+    min-width: 200px;
+}</code></pre>
+            </div>
+
+            <h3>Propiedades principales:</h3>
+            <ul>
+                <li><code>display: flex</code> - Activa flexbox</li>
+                <li><code>justify-content</code> - Alineación horizontal</li>
+                <li><code>align-items</code> - Alineación vertical</li>
+                <li><code>flex-direction</code> - Dirección (row/column)</li>
+                <li><code>flex-wrap</code> - Envolver elementos</li>
+                <li><code>flex</code> - Controlar crecimiento de items</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>6. CSS Grid</h2>
+            <p>Grid es el sistema de layout más poderoso de CSS para diseños complejos.</p>
+
+            <div class="grid-demo">
+                <div class="grid-item">1</div>
+                <div class="grid-item">2</div>
+                <div class="grid-item">3</div>
+                <div class="grid-item">4</div>
+                <div class="grid-item">5</div>
+                <div class="grid-item">6</div>
+            </div>
+
+            <div class="code-example">
+                <pre><code>.contenedor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
+    grid-template-rows: 100px 200px;       /* 2 filas específicas */
+    gap: 20px;                             /* Espacio entre celdas */
+}
+
+.item-grid {
+    background: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Posicionamiento específico */
+.item-especial {
+    grid-column: 1 / 3;  /* Ocupa columnas 1 y 2 */
+    grid-row: 1 / 3;     /* Ocupa filas 1 y 2 */
+}</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>7. CSS3: Transiciones y Animaciones</h2>
+
+            <h3>Transiciones:</h3>
+            <div class="code-example">
+                <pre><code>.boton {
+    background: #007bff;
+    transition: background-color 0.3s ease;
+}
+
+.boton:hover {
+    background: #0056b3;
+}</code></pre>
+            </div>
+
+            <h3>Animaciones:</h3>
+            <div class="code-example">
+                <pre><code>@keyframes girar {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.elemento-animado {
+    animation: girar 2s infinite linear;
+}</code></pre>
+            </div>
+
+            <h3>Transformaciones:</h3>
+            <div class="code-example">
+                <pre><code>.transformado {
+    transform: translateX(50px) rotate(45deg) scale(1.2);
+    transform-origin: center;
+}</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>8. Responsive Design</h2>
+            <p>Media queries permiten adaptar el diseño a diferentes tamaños de pantalla.</p>
+
+            <div class="code-example">
+                <pre><code>/* Mobile first */
+.contenedor {
+    width: 100%;
+    padding: 10px;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+    .contenedor {
+        width: 750px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 992px) {
+    .contenedor {
+        width: 970px;
+    }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+    .contenedor {
+        width: 1170px;
+    }
+}</code></pre>
+            </div>
+
+            <h3>Unidades responsivas:</h3>
+            <ul>
+                <li><code>vw/vh</code> - Viewport width/height (1% del viewport)</li>
+                <li><code>em/rem</code> - Relativo al tamaño de fuente</li>
+                <li><code>%</code> - Porcentaje del elemento padre</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>9. Mejores Prácticas</h2>
+
+            <h3>Organización del código:</h3>
+            <ul>
+                <li><strong>BEM:</strong> Block Element Modifier (ej: .header__title--large)</li>
+                <li><strong>SMACSS:</strong> Categorías: Base, Layout, Module, State, Theme</li>
+                <li><strong>Atomic CSS:</strong> Clases pequeñas y reutilizables</li>
+            </ul>
+
+            <h3>BEM en práctica:</h3>
+            <div class="code-example">
+                <pre><code>/* Bloque */
+.boton { }
+
+/* Elemento */
+.boton__icono { }
+
+/* Modificador */
+.boton--primario { }
+.boton--grande { }</code></pre>
+            </div>
+
+            <h3>Performance:</h3>
+            <ul>
+                <li>Minimiza el CSS</li>
+                <li>Usa sprites para iconos</li>
+                <li>Evita !important innecesario</li>
+                <li>Optimiza imágenes</li>
+                <li>Usa CSS crítico inline</li>
+            </ul>
+
+            <h3>Mantenibilidad:</h3>
+            <ul>
+                <li>Usa variables CSS para colores y medidas</li>
+                <li>Documenta tu CSS</li>
+                <li>Evita la especificidad excesiva</li>
+                <li>Reutiliza estilos comunes</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>10. Variables CSS y Funciones</h2>
+
+            <div class="code-example">
+                <pre><code>:root {
+    --color-primario: #007bff;
+    --espacio-pequeno: 8px;
+    --fuente-principal: 'Arial', sans-serif;
+}
+
+.boton {
+    background: var(--color-primario);
+    padding: var(--espacio-pequeno);
+    font-family: var(--fuente-principal);
+}
+
+/* Funciones CSS */
+.calculo {
+    width: calc(100% - 20px);
+    height: min(500px, 80vh);
+}</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>11. Proyecto Práctico: Card Responsiva</h2>
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Proyecto 1</h5>
+                            <p class="card-text">Descripción del proyecto con detalles técnicos.</p>
+                            <a href="#" class="btn btn-primary">Ver proyecto</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Proyecto 2</h5>
+                            <p class="card-text">Otro proyecto interesante con tecnologías modernas.</p>
+                            <a href="#" class="btn btn-primary">Ver proyecto</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Proyecto 3</h5>
+                            <p class="card-text">Proyecto final que demuestra todas las habilidades.</p>
+                            <a href="#" class="btn btn-primary">Ver proyecto</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-example">
+                <pre><code>&lt;style&gt;
+:root {
+    --color-primario: #007bff;
+    --sombra: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.tarjeta {
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--sombra);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.tarjeta:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+
+.tarjeta-imagen {
+    height: 200px;
+    background: linear-gradient(45deg, var(--color-primario), #0056b3);
+}
+
+.tarjeta-contenido {
+    padding: 20px;
+}
+
+.tarjeta-titulo {
+    color: var(--color-primario);
+    margin-bottom: 10px;
+}
+
+.tarjeta-boton {
+    background: var(--color-primario);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.tarjeta-boton:hover {
+    background: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tarjetas-grid {
+        grid-template-columns: 1fr;
+    }
+}
+&lt;/style&gt;
+
+&lt;div class="tarjetas-grid"&gt;
+    &lt;div class="tarjeta"&gt;
+        &lt;div class="tarjeta-imagen"&gt;&lt;/div&gt;
+        &lt;div class="tarjeta-contenido"&gt;
+            &lt;h3 class="tarjeta-titulo"&gt;Proyecto 1&lt;/h3&gt;
+            &lt;p&gt;Descripción del proyecto.&lt;/p&gt;
+            &lt;button class="tarjeta-boton"&gt;Ver más&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+        </section>
+
+        <footer class="text-center mt-5">
+            <p>Esta guía completa de CSS y CSS3 te preparará para crear diseños web modernos, responsivos y mantenibles.</p>
+            <p><strong>Recuerda:</strong> La práctica constante es la clave para dominar CSS. ¡Experimenta y crea!</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de HTML y Bootstrap</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .section { margin-bottom: 40px; }
+        .code-example { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        pre { margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="text-center mb-5">
+            <h1>Guía de HTML y Bootstrap</h1>
+            <p class="lead">Aprende HTML semántico, SEO y construcción rápida con Bootstrap</p>
+        </header>
+
+        <section class="section">
+            <h2>1. ¿Qué es HTML?</h2>
+            <p>HTML (HyperText Markup Language) es el lenguaje que estructura el contenido de las páginas web. Define elementos como párrafos, encabezados, imágenes y enlaces.</p>
+            <p><strong>Importante:</strong> HTML no es un lenguaje de programación, sino de marcado. Se enfoca en la estructura y el significado del contenido.</p>
+        </section>
+
+        <section class="section">
+            <h2>2. HTML Semántico</h2>
+            <p>El HTML semántico usa etiquetas que describen el significado del contenido, no solo su apariencia. Esto mejora la accesibilidad, SEO y mantenibilidad.</p>
+
+            <h3>Etiquetas semánticas principales:</h3>
+            <ul>
+                <li><code>&lt;header&gt;</code> - Cabecera de la página o sección</li>
+                <li><code>&lt;nav&gt;</code> - Navegación</li>
+                <li><code>&lt;main&gt;</code> - Contenido principal</li>
+                <li><code>&lt;section&gt;</code> - Sección de contenido</li>
+                <li><code>&lt;article&gt;</code> - Contenido independiente</li>
+                <li><code>&lt;aside&gt;</code> - Contenido lateral</li>
+                <li><code>&lt;footer&gt;</code> - Pie de página</li>
+            </ul>
+
+            <div class="code-example">
+                <pre><code>&lt;!-- Estructura semántica básica --&gt;
+&lt;header&gt;
+    &lt;h1&gt;Título de la página&lt;/h1&gt;
+&lt;/header&gt;
+
+&lt;nav&gt;
+    &lt;ul&gt;
+        &lt;li&gt;&lt;a href="#inicio"&gt;Inicio&lt;/a&gt;&lt;/li&gt;
+        &lt;li&gt;&lt;a href="#acerca"&gt;Acerca de&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/nav&gt;
+
+&lt;main&gt;
+    &lt;section id="inicio"&gt;
+        &lt;h2&gt;Bienvenido&lt;/h2&gt;
+        &lt;p&gt;Contenido principal aquí.&lt;/p&gt;
+    &lt;/section&gt;
+&lt;/main&gt;
+
+&lt;footer&gt;
+    &lt;p&gt;© 2024 Mi Sitio Web&lt;/p&gt;
+&lt;/footer&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>3. SEO (Search Engine Optimization)</h2>
+            <p>El SEO optimiza tu sitio para que aparezca en los resultados de búsqueda. Incluye técnicas técnicas y de contenido.</p>
+
+            <h3>Elementos esenciales para SEO:</h3>
+            <ul>
+                <li><strong>Título de página:</strong> Describe claramente el contenido</li>
+                <li><strong>Meta description:</strong> Resumen atractivo de la página</li>
+                <li><strong>Encabezados (H1-H6):</strong> Estructura jerárquica del contenido</li>
+                <li><strong>Atributos alt en imágenes:</strong> Descripción para motores de búsqueda</li>
+                <li><strong>URLs amigables:</strong> Legibles y descriptivas</li>
+                <li><strong>Contenido de calidad:</strong> Información útil y relevante</li>
+            </ul>
+
+            <div class="code-example">
+                <pre><code>&lt;!-- Ejemplo de head optimizado para SEO --&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Guía Completa de JavaScript para Principiantes&lt;/title&gt;
+    &lt;meta name="description" content="Aprende JavaScript desde cero con ejemplos prácticos, proyectos y mejores prácticas para desarrolladores web."&gt;
+    &lt;meta name="keywords" content="javascript, tutorial, principiantes, desarrollo web"&gt;
+    &lt;link rel="canonical" href="https://misitio.com/guia-javascript"&gt;
+&lt;/head&gt;</code></pre>
+            </div>
+
+            <h3>Consejos para SEO en HTML:</h3>
+            <ul>
+                <li>Usa solo un H1 por página</li>
+                <li>Estructura los encabezados en orden jerárquico (H1 → H2 → H3)</li>
+                <li>Incluye palabras clave relevantes en títulos y contenido</li>
+                <li>Optimiza la velocidad de carga</li>
+                <li>Asegura que el sitio sea móvil-friendly</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>4. Introducción a Bootstrap</h2>
+            <p>Bootstrap es un framework CSS que acelera el desarrollo de interfaces responsivas. Incluye componentes pre-diseñados y un sistema de grid.</p>
+
+            <h3>¿Por qué usar Bootstrap?</h3>
+            <ul>
+                <li><strong>Rápido:</strong> Componentes listos para usar</li>
+                <li><strong>Responsivo:</strong> Se adapta a móviles, tablets y desktop</li>
+                <li><strong>Consistente:</strong> Diseño uniforme</li>
+                <li><strong>Personalizable:</strong> Puedes modificar estilos</li>
+            </ul>
+
+            <h3>Instalación:</h3>
+            <div class="code-example">
+                <pre><code>&lt;!-- Agrega esto en el &lt;head&gt; --&gt;
+&lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+
+&lt;!-- Agrega esto antes del cierre de &lt;/body&gt; --&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>5. Sistema de Grid de Bootstrap</h2>
+            <p>El grid divide la página en 12 columnas. Usa clases como <code>col</code>, <code>col-md-6</code>, etc.</p>
+
+            <div class="row mb-3">
+                <div class="col-md-6 bg-light p-3">
+                    <h4>Columna 1</h4>
+                    <p>Esta columna ocupa 6 de 12 espacios en pantallas medianas y superiores.</p>
+                </div>
+                <div class="col-md-6 bg-secondary p-3 text-white">
+                    <h4>Columna 2</h4>
+                    <p>Esta columna también ocupa 6 espacios.</p>
+                </div>
+            </div>
+
+            <div class="code-example">
+                <pre><code>&lt;div class="container"&gt;
+    &lt;div class="row"&gt;
+        &lt;div class="col-md-4"&gt;Columna 1&lt;/div&gt;
+        &lt;div class="col-md-4"&gt;Columna 2&lt;/div&gt;
+        &lt;div class="col-md-4"&gt;Columna 3&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>6. Componentes de Bootstrap</h2>
+
+            <h3>Botones:</h3>
+            <button class="btn btn-primary me-2">Botón Primario</button>
+            <button class="btn btn-secondary me-2">Botón Secundario</button>
+            <button class="btn btn-success">Botón Éxito</button>
+
+            <div class="code-example">
+                <pre><code>&lt;button class="btn btn-primary"&gt;Botón Primario&lt;/button&gt;
+&lt;button class="btn btn-outline-secondary"&gt;Botón Outline&lt;/button&gt;</code></pre>
+            </div>
+
+            <h3>Navbar:</h3>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">Mi Sitio</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#">Inicio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Acerca</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Contacto</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="code-example">
+                <pre><code>&lt;nav class="navbar navbar-expand-lg navbar-light bg-light"&gt;
+    &lt;div class="container-fluid"&gt;
+        &lt;a class="navbar-brand" href="#"&gt;Mi Sitio&lt;/a&gt;
+        &lt;button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"&gt;
+            &lt;span class="navbar-toggler-icon"&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;div class="collapse navbar-collapse" id="navbarNav"&gt;
+            &lt;ul class="navbar-nav"&gt;
+                &lt;li class="nav-item"&gt;
+                    &lt;a class="nav-link" href="#"&gt;Inicio&lt;/a&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;</code></pre>
+            </div>
+
+            <h3>Card:</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Título de la Card</h5>
+                            <p class="card-text">Contenido de la card con descripción breve.</p>
+                            <a href="#" class="btn btn-primary">Ver más</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-example">
+                <pre><code>&lt;div class="card"&gt;
+    &lt;div class="card-body"&gt;
+        &lt;h5 class="card-title"&gt;Título&lt;/h5&gt;
+        &lt;p class="card-text"&gt;Contenido&lt;/p&gt;
+        &lt;a href="#" class="btn btn-primary"&gt;Acción&lt;/a&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>7. Formularios con Bootstrap</h2>
+            <form>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Correo electrónico</label>
+                    <input type="email" class="form-control" id="email" placeholder="tu@email.com">
+                </div>
+                <div class="mb-3">
+                    <label for="mensaje" class="form-label">Mensaje</label>
+                    <textarea class="form-control" id="mensaje" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+
+            <div class="code-example">
+                <pre><code>&lt;form&gt;
+    &lt;div class="mb-3"&gt;
+        &lt;label for="email" class="form-label"&gt;Correo electrónico&lt;/label&gt;
+        &lt;input type="email" class="form-control" id="email"&gt;
+    &lt;/div&gt;
+    &lt;button type="submit" class="btn btn-primary"&gt;Enviar&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>8. Utilidades de Bootstrap</h2>
+            <p>Bootstrap incluye muchas clases de utilidad para espaciado, colores, etc.</p>
+
+            <h3>Espaciado:</h3>
+            <div class="bg-primary text-white p-3 mb-3">Padding y margin con clases</div>
+            <div class="bg-secondary text-white p-3 ms-3">Más espaciado</div>
+
+            <h3>Colores:</h3>
+            <span class="badge bg-primary me-2">Primary</span>
+            <span class="badge bg-success me-2">Success</span>
+            <span class="badge bg-warning text-dark">Warning</span>
+
+            <h3>Texto:</h3>
+            <p class="text-muted">Texto muted</p>
+            <p class="fw-bold">Texto en negrita</p>
+            <p class="text-center">Texto centrado</p>
+        </section>
+
+        <section class="section">
+            <h2>9. Buenas Prácticas</h2>
+            <ul>
+                <li><strong>HTML semántico:</strong> Usa las etiquetas correctas para el contenido</li>
+                <li><strong>SEO primero:</strong> Optimiza títulos, meta tags y estructura antes del diseño</li>
+                <li><strong>Responsive:</strong> Siempre diseña mobile-first con Bootstrap</li>
+                <li><strong>Accesibilidad:</strong> Usa atributos alt, labels y navegación por teclado</li>
+                <li><strong>Rendimiento:</strong> Minimiza CSS/JS y optimiza imágenes</li>
+                <li><strong>Mantenibilidad:</strong> Usa clases de Bootstrap consistentes</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>10. Proyecto Práctico: Página de Portafolio</h2>
+            <p>Aquí tienes un ejemplo completo de una página de portafolio usando HTML semántico, SEO y Bootstrap.</p>
+
+            <div class="code-example">
+                <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Mi Portafolio - Desarrollador Web&lt;/title&gt;
+    &lt;meta name="description" content="Portafolio de Juan Pérez, desarrollador web especializado en JavaScript y React."&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header class="bg-dark text-white py-5"&gt;
+        &lt;div class="container"&gt;
+            &lt;h1&gt;Juan Pérez&lt;/h1&gt;
+            &lt;p class="lead"&gt;Desarrollador Web Full Stack&lt;/p&gt;
+        &lt;/div&gt;
+    &lt;/header&gt;
+
+    &lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark"&gt;
+        &lt;div class="container"&gt;
+            &lt;a class="navbar-brand" href="#"&gt;Mi Portafolio&lt;/a&gt;
+            &lt;div class="navbar-nav"&gt;
+                &lt;a class="nav-link" href="#proyectos"&gt;Proyectos&lt;/a&gt;
+                &lt;a class="nav-link" href="#contacto"&gt;Contacto&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+
+    &lt;main class="container my-5"&gt;
+        &lt;section id="proyectos"&gt;
+            &lt;h2&gt;Mis Proyectos&lt;/h2&gt;
+            &lt;div class="row"&gt;
+                &lt;div class="col-md-4"&gt;
+                    &lt;div class="card"&gt;
+                        &lt;div class="card-body"&gt;
+                            &lt;h5 class="card-title"&gt;Proyecto 1&lt;/h5&gt;
+                            &lt;p class="card-text"&gt;Descripción del proyecto.&lt;/p&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/section&gt;
+    &lt;/main&gt;
+
+    &lt;footer class="bg-dark text-white text-center py-3"&gt;
+        &lt;p&gt;© 2024 Juan Pérez&lt;/p&gt;
+    &lt;/footer&gt;
+
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+        </section>
+
+        <footer class="text-center mt-5">
+            <p>Esta guía te ayudará a crear páginas web modernas, accesibles y optimizadas para SEO usando HTML semántico y Bootstrap.</p>
+        </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
