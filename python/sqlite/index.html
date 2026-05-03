@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQLite - Base de Datos Ligera</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: #003B57; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; font-weight: bold; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #003B57; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#instalacion">Instalación</a>
+            <a href="#operaciones">Operaciones</a>
+            <a href="#tablas">Tablas y Esquemas</a>
+            <a href="#consultas">Consultas</a>
+            <a href="#python">SQLite con Python</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>📊 SQLite - Base de Datos Ligera</h1>
+
+        <section id="intro" class="section">
+            <h2>Introducción a SQLite</h2>
+            <p>SQLite es una base de datos relacional ligera que no requiere servidor. Es perfecta para desarrollo, prototipos y aplicaciones pequeñas.</p>
+            <h3>¿Por qué SQLite?</h3>
+            <ul>
+                <li><strong>Sin servidor:</strong> No requiere instalación de servidor de base de datos</li>
+                <li><strong>Archivo único:</strong> Toda la base de datos en un solo archivo</li>
+                <li><strong>Zero-config:</strong> No necesita configuración</li>
+                <li><strong>Portable:</strong> Fácil de mover entre sistemas</li>
+                <li><strong>Rápido:</strong> Excelente performance para operaciones locales</li>
+                <li><strong>SQL estándar:</strong> Compatible con la mayoría de comandos SQL</li>
+            </ul>
+            <h3>Casos de uso ideales</h3>
+            <ul>
+                <li>Aplicaciones de escritorio</li>
+                <li>Prototipos y desarrollo</li>
+                <li>Aplicaciones móviles</li>
+                <li>Datos embebidos</li>
+                <li>Testing y desarrollo local</li>
+                <li>Configuraciones y caches locales</li>
+            </ul>
+        </section>
+
+        <section id="instalacion" class="section">
+            <h2>Instalación y Primeros Pasos</h2>
+            <h3>Instalación</h3>
+            <div class="example">
+                <pre><code># SQLite viene incluido en Python
+python --version
+
+# Verificar que SQLite esté disponible
+python -c "import sqlite3; print(sqlite3.version)"
+
+# Crear primera base de datos
+sqlite3 mi_base.db
+SQLite version 3.37.0 2021-12-09 01:34:53
+Enter ".help" for usage hints.
+sqlite> .quit</code></pre>
+            </div>
+
+            <h3>Comandos Básicos en SQLite CLI</h3>
+            <div class="example">
+                <pre><code># Iniciar SQLite
+sqlite3 mi_base.db
+
+# Comandos útiles
+.help                    # Mostrar ayuda
+.databases              # Ver bases de datos conectadas
+.tables                 # Listar tablas
+.schema tabla           # Ver esquema de tabla
+.quit                   # Salir
+
+# Crear tabla
+CREATE TABLE usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    edad INTEGER,
+    activo BOOLEAN DEFAULT 1,
+    fecha_registro TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+# Insertar datos
+INSERT INTO usuarios (nombre, email, edad) VALUES 
+('Juan Pérez', 'juan@email.com', 25),
+('María García', 'maria@email.com', 30);
+
+# Consultar datos
+SELECT * FROM usuarios;
+SELECT nombre, email FROM usuarios WHERE activo = 1;
+
+# Salir
+.quit</code></pre>
+            </div>
+        </section>
+
+        <section id="operaciones" class="section">
+            <h2>Operaciones CRUD</h2>
+            <h3>Crear (INSERT)</h3>
+            <div class="example">
+                <pre><code>-- Insertar un registro
+INSERT INTO usuarios (nombre, email, edad) 
+VALUES ('Carlos López', 'carlos@email.com', 28);
+
+-- Insertar múltiples registros
+INSERT INTO usuarios (nombre, email, edad) VALUES 
+('Ana Rodríguez', 'ana@email.com', 32),
+('Pedro Sánchez', 'pedro@email.com', 45),
+('Laura Martín', 'laura@email.com', 29);
+
+-- Insertar con valores por defecto
+INSERT INTO usuarios (nombre, email) 
+VALUES ('Miguel Ángel', 'miguel@email.com');
+-- edad será NULL, activo será 1, fecha_registro será CURRENT_TIMESTAMP
+
+-- Insertar desde otra tabla
+INSERT INTO usuarios_activos (id, nombre, email)
+SELECT id, nombre, email FROM usuarios WHERE activo = 1;</code></pre>
+            </div>
+
+            <h3>Leer (SELECT)</h3>
+            <div class="example">
+                <pre><code>-- Seleccionar todos los campos
+SELECT * FROM usuarios;
+
+-- Seleccionar campos específicos
+SELECT nombre, email FROM usuarios;
+
+-- Con condiciones
+SELECT * FROM usuarios WHERE edad > 25;
+SELECT * FROM usuarios WHERE activo = 1 AND edad BETWEEN 20 AND 35;
+
+-- Ordenamiento
+SELECT * FROM usuarios ORDER BY edad ASC;
+SELECT * FROM usuarios ORDER BY fecha_registro DESC;
+
+-- Limitación de resultados
+SELECT * FROM usuarios LIMIT 5;
+SELECT * FROM usuarios ORDER BY edad DESC LIMIT 3;
+
+-- Búsqueda de texto
+SELECT * FROM usuarios WHERE nombre LIKE 'J%';
+SELECT * FROM usuarios WHERE email LIKE '%@gmail.com';
+
+-- Funciones agregadas
+SELECT COUNT(*) as total FROM usuarios;
+SELECT AVG(edad) as edad_promedio FROM usuarios;
+SELECT MAX(edad) as edad_maxima, MIN(edad) as edad_minima FROM usuarios;
+SELECT SUM(edad) as suma_edades FROM usuarios WHERE activo = 1;
+
+-- Agrupamiento
+SELECT activo, COUNT(*) as cantidad FROM usuarios GROUP BY activo;
+SELECT strftime('%Y', fecha_registro) as año, COUNT(*) as registros 
+FROM usuarios GROUP BY año;</code></pre>
+            </div>
+
+            <h3>Actualizar (UPDATE)</h3>
+            <div class="example">
+                <pre><code>-- Actualizar un campo
+UPDATE usuarios SET edad = 26 WHERE id = 1;
+
+-- Actualizar múltiples campos
+UPDATE usuarios SET 
+    edad = 31, 
+    activo = 0 
+WHERE email = 'maria@email.com';
+
+-- Actualizar con condición compleja
+UPDATE usuarios SET activo = 0 
+WHERE fecha_registro < datetime('now', '-1 year');
+
+-- Actualizar basado en otra tabla (subquery)
+UPDATE usuarios SET edad = (
+    SELECT AVG(edad) FROM usuarios WHERE activo = 1
+) WHERE id = 5;
+
+-- Actualizar múltiples registros
+UPDATE usuarios SET activo = 1 WHERE edad < 30;</code></pre>
+            </div>
+
+            <h3>Eliminar (DELETE)</h3>
+            <div class="example">
+                <pre><code>-- Eliminar un registro específico
+DELETE FROM usuarios WHERE id = 3;
+
+-- Eliminar con condición
+DELETE FROM usuarios WHERE activo = 0;
+
+-- Eliminar registros antiguos
+DELETE FROM usuarios 
+WHERE fecha_registro < datetime('now', '-2 years');
+
+-- Eliminar todos los registros (vaciar tabla)
+DELETE FROM usuarios;
+
+-- Resetear contador de autoincremento
+DELETE FROM sqlite_sequence WHERE name='usuarios';</code></pre>
+            </div>
+        </section>
+
+        <section id="tablas" class="section">
+            <h2>Tablas y Esquemas</h2>
+            <h3>Tipos de Datos</h3>
+            <div class="example">
+                <pre><code>-- Tipos de datos principales
+CREATE TABLE productos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,                    -- Cadena de texto
+    descripcion TEXT,                        -- Texto largo
+    precio REAL,                             -- Número decimal
+    stock INTEGER DEFAULT 0,                 -- Número entero
+    disponible BOOLEAN DEFAULT 1,            -- Verdadero/falso
+    fecha_creacion TEXT DEFAULT CURRENT_TIMESTAMP,
+    imagen BLOB                              -- Datos binarios
+);
+
+-- Tipos numéricos
+CREATE TABLE medidas (
+    id INTEGER PRIMARY KEY,
+    temperatura REAL,                        -- -1.5, 23.7, etc.
+    cantidad INTEGER,                        -- -2, 0, 15, etc.
+    porcentaje REAL CHECK(porcentaje >= 0 AND porcentaje <= 100)
+);
+
+-- Fechas y horas
+CREATE TABLE eventos (
+    id INTEGER PRIMARY KEY,
+    titulo TEXT NOT NULL,
+    fecha_inicio TEXT,                       -- '2024-01-15'
+    hora_inicio TEXT,                        -- '14:30:00'
+    fecha_hora TEXT,                         -- '2024-01-15 14:30:00'
+    duracion_minutos INTEGER
+);</code></pre>
+            </div>
+
+            <h3>Constraints y Restricciones</h3>
+            <div class="example">
+                <pre><code>-- Restricciones de tabla
+CREATE TABLE empleados (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    salario REAL CHECK(salario > 0),
+    departamento_id INTEGER,
+    fecha_contratacion TEXT DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Clave foránea
+    FOREIGN KEY (departamento_id) REFERENCES departamentos(id)
+);
+
+-- Restricciones con nombres personalizados
+CREATE TABLE cuentas (
+    id INTEGER PRIMARY KEY,
+    numero TEXT UNIQUE 
+        CONSTRAINT cuenta_unica 
+        NOT NULL,
+    saldo REAL 
+        CONSTRAINT saldo_positivo 
+        CHECK(saldo >= 0),
+    tipo TEXT 
+        CONSTRAINT tipo_valido 
+        CHECK(tipo IN ('ahorros', 'corriente', 'credito'))
+);
+
+-- Índices para mejorar performance
+CREATE INDEX idx_empleados_email ON empleados(email);
+CREATE INDEX idx_empleados_departamento ON empleados(departamento_id);
+CREATE UNIQUE INDEX idx_cuentas_numero ON cuentas(numero);</code></pre>
+            </div>
+
+            <h3>Modificar Tablas</h3>
+            <div class="example">
+                <pre><code>-- Agregar columna
+ALTER TABLE usuarios ADD COLUMN telefono TEXT;
+
+-- Renombrar columna
+ALTER TABLE usuarios RENAME COLUMN telefono TO telefono_contacto;
+
+-- Eliminar columna (SQLite 3.35.0+)
+ALTER TABLE usuarios DROP COLUMN telefono_contacto;
+
+-- Renombrar tabla
+ALTER TABLE usuarios_old RENAME TO usuarios;
+
+-- Agregar restricción
+-- Nota: SQLite tiene limitaciones para modificar constraints existentes
+-- Es mejor recrear la tabla o usar triggers
+
+-- Crear tabla con nueva estructura
+CREATE TABLE usuarios_nueva (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    telefono TEXT,
+    activo BOOLEAN DEFAULT 1,
+    fecha_registro TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Copiar datos
+INSERT INTO usuarios_nueva (id, nombre, email, activo, fecha_registro)
+SELECT id, nombre, email, activo, fecha_registro FROM usuarios;
+
+-- Reemplazar tabla
+DROP TABLE usuarios;
+ALTER TABLE usuarios_nueva RENAME TO usuarios;</code></pre>
+            </div>
+        </section>
+
+        <section id="consultas" class="section">
+            <h2>Consultas Avanzadas</h2>
+            <h3>Joins</h3>
+            <div class="example">
+                <pre><code>-- Crear tablas de ejemplo
+CREATE TABLE departamentos (
+    id INTEGER PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    ubicacion TEXT
+);
+
+CREATE TABLE empleados (
+    id INTEGER PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    departamento_id INTEGER,
+    salario REAL,
+    FOREIGN KEY (departamento_id) REFERENCES departamentos(id)
+);
+
+-- INNER JOIN
+SELECT e.nombre, d.nombre as departamento, e.salario
+FROM empleados e
+INNER JOIN departamentos d ON e.departamento_id = d.id;
+
+-- LEFT JOIN
+SELECT e.nombre, d.nombre as departamento
+FROM empleados e
+LEFT JOIN departamentos d ON e.departamento_id = d.id;
+
+-- RIGHT JOIN (usando LEFT JOIN invertido)
+SELECT d.nombre as departamento, e.nombre
+FROM departamentos d
+LEFT JOIN empleados e ON d.id = e.departamento_id;
+
+-- FULL OUTER JOIN (simulado con UNION)
+SELECT e.nombre, d.nombre as departamento
+FROM empleados e
+LEFT JOIN departamentos d ON e.departamento_id = d.id
+UNION ALL
+SELECT NULL, d.nombre
+FROM departamentos d
+LEFT JOIN empleados e ON d.id = e.departamento_id
+WHERE e.id IS NULL;
+
+-- JOIN con múltiples tablas
+SELECT e.nombre, d.nombre as departamento, p.nombre as proyecto
+FROM empleados e
+JOIN departamentos d ON e.departamento_id = d.id
+JOIN proyectos_empleados pe ON e.id = pe.empleado_id
+JOIN proyectos p ON pe.proyecto_id = p.id;</code></pre>
+            </div>
+
+            <h3>Subconsultas</h3>
+            <div class="example">
+                <pre><code>-- Subconsulta en WHERE
+SELECT nombre, salario FROM empleados 
+WHERE salario > (SELECT AVG(salario) FROM empleados);
+
+-- Subconsulta en SELECT
+SELECT nombre, 
+       salario,
+       (SELECT nombre FROM departamentos WHERE id = empleados.departamento_id) as departamento
+FROM empleados;
+
+-- Subconsulta en FROM
+SELECT departamento, COUNT(*) as empleados, AVG(salario) as salario_promedio
+FROM (
+    SELECT d.nombre as departamento, e.salario
+    FROM empleados e
+    JOIN departamentos d ON e.departamento_id = d.id
+) 
+GROUP BY departamento;
+
+-- EXISTS
+SELECT nombre FROM empleados e
+WHERE EXISTS (
+    SELECT 1 FROM proyectos_empleados pe 
+    WHERE pe.empleado_id = e.id
+);
+
+-- IN con subconsulta
+SELECT nombre FROM empleados 
+WHERE departamento_id IN (
+    SELECT id FROM departamentos WHERE ubicacion = 'Madrid'
+);</code></pre>
+            </div>
+
+            <h3>Funciones y Expresiones</h3>
+            <div class="example">
+                <pre><code>-- Funciones de texto
+SELECT 
+    nombre,
+    UPPER(nombre) as mayusculas,
+    LOWER(email) as minusculas,
+    LENGTH(nombre) as longitud,
+    SUBSTR(nombre, 1, 3) as primeros_tres,
+    REPLACE(email, '@', '[at]') as email_modificado
+FROM usuarios;
+
+-- Funciones numéricas
+SELECT 
+    nombre,
+    ROUND(salario, 2) as salario_redondeado,
+    ABS(salario - (SELECT AVG(salario) FROM empleados)) as diferencia_con_promedio,
+    salario * 1.1 as salario_incrementado
+FROM empleados;
+
+-- Funciones de fecha
+SELECT 
+    nombre,
+    fecha_registro,
+    strftime('%Y-%m-%d', fecha_registro) as fecha,
+    strftime('%H:%M:%S', fecha_registro) as hora,
+    strftime('%w', fecha_registro) as dia_semana,  -- 0=domingo, 6=sábado
+    date('now') as hoy,
+    datetime('now', '+1 day') as mañana
+FROM usuarios;
+
+-- CASE expressions
+SELECT 
+    nombre,
+    salario,
+    CASE 
+        WHEN salario < 20000 THEN 'Bajo'
+        WHEN salario < 40000 THEN 'Medio'
+        ELSE 'Alto'
+    END as nivel_salarial
+FROM empleados;
+
+-- COALESCE (manejo de NULL)
+SELECT 
+    nombre,
+    COALESCE(telefono, 'No especificado') as telefono,
+    COALESCE(salario, 0) as salario_seguro
+FROM empleados;</code></pre>
+            </div>
+
+            <h3>Transacciones</h3>
+            <div class="example">
+                <pre><code>-- Iniciar transacción
+BEGIN TRANSACTION;
+
+-- Operaciones
+UPDATE cuentas SET saldo = saldo - 100 WHERE id = 1;
+UPDATE cuentas SET saldo = saldo + 100 WHERE id = 2;
+
+-- Verificar consistencia
+SELECT SUM(saldo) FROM cuentas;
+
+-- Confirmar transacción
+COMMIT;
+
+-- O revertir si hay error
+ROLLBACK;
+
+-- Savepoints
+BEGIN TRANSACTION;
+UPDATE cuentas SET saldo = saldo - 50 WHERE id = 1;
+SAVEPOINT punto_guardado;
+UPDATE cuentas SET saldo = saldo - 30 WHERE id = 1;  -- Esto podría fallar
+ROLLBACK TO SAVEPOINT punto_guardado;  -- Volver al savepoint
+COMMIT;</code></pre>
+            </div>
+        </section>
+
+        <section id="python" class="section">
+            <h2>SQLite con Python</h2>
+            <h3>Módulo sqlite3</h3>
+            <div class="example">
+                <pre><code>import sqlite3
+from datetime import datetime
+
+def crear_conexion():
+    """Crear conexión a la base de datos"""
+    try:
+        conn = sqlite3.connect('mi_base.db')
+        print("Conexión exitosa a SQLite")
+        return conn
+    except sqlite3.Error as e:
+        print(f"Error al conectar: {e}")
+        return None
+
+def crear_tabla(conn):
+    """Crear tabla"""
+    try:
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nombre TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                edad INTEGER,
+                activo BOOLEAN DEFAULT 1,
+                fecha_registro TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        conn.commit()
+        print("Tabla creada exitosamente")
+        
+    except sqlite3.Error as e:
+        print(f"Error al crear tabla: {e}")
+
+def insertar_usuario(conn, usuario):
+    """Insertar un usuario"""
+    sql = '''INSERT INTO usuarios (nombre, email, edad) 
+             VALUES (?, ?, ?)'''
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, usuario)
+        conn.commit()
+        
+        print(f"Usuario insertado con ID: {cursor.lastrowid}")
+        return cursor.lastrowid
+        
+    except sqlite3.Error as e:
+        print(f"Error al insertar: {e}")
+        return None
+
+def consultar_usuarios(conn):
+    """Consultar todos los usuarios"""
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM usuarios")
+        
+        filas = cursor.fetchall()
+        
+        print("=== USUARIOS ===")
+        for fila in filas:
+            print(f"ID: {fila[0]}, Nombre: {fila[1]}, Email: {fila[2]}, Edad: {fila[3]}")
+            
+        return filas
+        
+    except sqlite3.Error as e:
+        print(f"Error al consultar: {e}")
+        return []
+
+def actualizar_usuario(conn, usuario_id, nuevos_datos):
+    """Actualizar usuario"""
+    sql = '''UPDATE usuarios 
+             SET nombre = ?, email = ?, edad = ? 
+             WHERE id = ?'''
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (*nuevos_datos, usuario_id))
+        conn.commit()
+        
+        print(f"Usuario {usuario_id} actualizado")
+        return cursor.rowcount
+        
+    except sqlite3.Error as e:
+        print(f"Error al actualizar: {e}")
+        return 0
+
+def eliminar_usuario(conn, usuario_id):
+    """Eliminar usuario"""
+    sql = 'DELETE FROM usuarios WHERE id = ?'
+    
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql, (usuario_id,))
+        conn.commit()
+        
+        print(f"Usuario {usuario_id} eliminado")
+        return cursor.rowcount
+        
+    except sqlite3.Error as e:
+        print(f"Error al eliminar: {e}")
+        return 0
+
+def main():
+    # Crear conexión
+    conn = crear_conexion()
+    
+    if conn is not None:
+        # Crear tabla
+        crear_tabla(conn)
+        
+        # Insertar usuarios
+        usuarios = [
+            ('Juan Pérez', 'juan@email.com', 25),
+            ('María García', 'maria@email.com', 30),
+            ('Carlos López', 'carlos@email.com', 28)
+        ]
+        
+        for usuario in usuarios:
+            insertar_usuario(conn, usuario)
+        
+        # Consultar usuarios
+        consultar_usuarios(conn)
+        
+        # Actualizar usuario
+        actualizar_usuario(conn, 1, ('Juan Carlos Pérez', 'juancarlos@email.com', 26))
+        
+        # Consultar nuevamente
+        consultar_usuarios(conn)
+        
+        # Cerrar conexión
+        conn.close()
+        print("Conexión cerrada")
+    else:
+        print("No se pudo establecer conexión")
+
+if __name__ == '__main__':
+    main()</code></pre>
+            </div>
+
+            <h3>Context Manager y Manejo de Errores</h3>
+            <div class="example">
+                <pre><code>import sqlite3
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class DatabaseManager:
+    def __init__(self, db_path):
+        self.db_path = db_path
+    
+    def __enter__(self):
+        self.conn = sqlite3.connect(self.db_path)
+        self.conn.execute("PRAGMA foreign_keys = ON")  # Habilitar claves foráneas
+        return self.conn
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.conn:
+            if exc_type is None:
+                self.conn.commit()
+                logger.info("Transacción confirmada")
+            else:
+                self.conn.rollback()
+                logger.error(f"Transacción revertida: {exc_val}")
+            self.conn.close()
+
+def crear_tabla_productos():
+    """Crear tabla de productos con manejo de errores"""
+    with DatabaseManager('tienda.db') as conn:
+        try:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS productos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nombre TEXT NOT NULL,
+                    precio REAL NOT NULL CHECK(precio > 0),
+                    stock INTEGER DEFAULT 0 CHECK(stock >= 0),
+                    categoria TEXT,
+                    fecha_creacion TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            logger.info("Tabla productos creada")
+        except sqlite3.Error as e:
+            logger.error(f"Error creando tabla: {e}")
+            raise
+
+def insertar_productos(productos):
+    """Insertar múltiples productos con transacción"""
+    with DatabaseManager('tienda.db') as conn:
+        try:
+            conn.executemany('''
+                INSERT INTO productos (nombre, precio, stock, categoria)
+                VALUES (?, ?, ?, ?)
+            ''', productos)
+            logger.info(f"{len(productos)} productos insertados")
+        except sqlite3.IntegrityError as e:
+            logger.error(f"Error de integridad: {e}")
+            raise
+        except sqlite3.Error as e:
+            logger.error(f"Error insertando productos: {e}")
+            raise
+
+def consultar_productos_con_paginacion(pagina=1, por_pagina=10):
+    """Consultar productos con paginación"""
+    offset = (pagina - 1) * por_pagina
+    
+    with DatabaseManager('tienda.db') as conn:
+        try:
+            cursor = conn.cursor()
+            
+            # Obtener productos
+            cursor.execute('''
+                SELECT id, nombre, precio, stock, categoria, fecha_creacion
+                FROM productos
+                ORDER BY fecha_creacion DESC
+                LIMIT ? OFFSET ?
+            ''', (por_pagina, offset))
+            
+            productos = cursor.fetchall()
+            
+            # Obtener total de productos
+            cursor.execute('SELECT COUNT(*) FROM productos')
+            total = cursor.fetchone()[0]
+            
+            return {
+                'productos': productos,
+                'total': total,
+                'pagina': pagina,
+                'por_pagina': por_pagina,
+                'paginas_totales': (total + por_pagina - 1) // por_pagina
+            }
+            
+        except sqlite3.Error as e:
+            logger.error(f"Error consultando productos: {e}")
+            return None
+
+def buscar_productos(query, categoria=None, precio_max=None):
+    """Búsqueda avanzada de productos"""
+    with DatabaseManager('tienda.db') as conn:
+        try:
+            cursor = conn.cursor()
+            
+            sql = '''
+                SELECT id, nombre, precio, stock, categoria
+                FROM productos
+                WHERE nombre LIKE ?
+            '''
+            params = [f'%{query}%']
+            
+            if categoria:
+                sql += ' AND categoria = ?'
+                params.append(categoria)
+            
+            if precio_max:
+                sql += ' AND precio <= ?'
+                params.append(precio_max)
+            
+            sql += ' ORDER BY precio ASC'
+            
+            cursor.execute(sql, params)
+            return cursor.fetchall()
+            
+        except sqlite3.Error as e:
+            logger.error(f"Error en búsqueda: {e}")
+            return []
+
+def actualizar_stock(producto_id, nuevo_stock):
+    """Actualizar stock con validación"""
+    if nuevo_stock < 0:
+        raise ValueError("El stock no puede ser negativo")
+    
+    with DatabaseManager('tienda.db') as conn:
+        try:
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                UPDATE productos 
+                SET stock = ? 
+                WHERE id = ?
+            ''', (nuevo_stock, producto_id))
+            
+            if cursor.rowcount == 0:
+                raise ValueError(f"Producto con ID {producto_id} no encontrado")
+            
+            logger.info(f"Stock del producto {producto_id} actualizado a {nuevo_stock}")
+            
+        except sqlite3.Error as e:
+            logger.error(f"Error actualizando stock: {e}")
+            raise
+
+# Uso de las funciones
+if __name__ == '__main__':
+    try:
+        # Crear tabla
+        crear_tabla_productos()
+        
+        # Insertar productos de ejemplo
+        productos_ejemplo = [
+            ('Laptop Gaming', 1299.99, 10, 'Electrónica'),
+            ('Smartphone', 699.99, 25, 'Electrónica'),
+            ('Camiseta', 19.99, 50, 'Ropa'),
+            ('Libro Python', 39.99, 30, 'Libros')
+        ]
+        
+        insertar_productos(productos_ejemplo)
+        
+        # Consultar con paginación
+        resultado = consultar_productos_con_paginacion(pagina=1, por_pagina=2)
+        if resultado:
+            print(f"Página {resultado['pagina']} de {resultado['paginas_totales']}")
+            for producto in resultado['productos']:
+                print(f"{producto[1]} - ${producto[2]}")
+        
+        # Buscar productos
+        resultados = buscar_productos('Laptop', precio_max=1500)
+        print(f"Resultados de búsqueda: {len(resultados)}")
+        
+        # Actualizar stock
+        actualizar_stock(1, 15)
+        
+    except Exception as e:
+        logger.error(f"Error en la aplicación: {e}")</code></pre>
+            </div>
+
+            <h3>ORM con SQLAlchemy</h3>
+            <div class="example">
+                <pre><code>from sqlalchemy import create_engine, Column, Integer, String, Float, Boolean, DateTime, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+from datetime import datetime
+
+# Crear engine para SQLite
+engine = create_engine('sqlite:///tienda_orm.db', echo=True)
+
+# Base para modelos
+Base = declarative_base()
+
+# Modelo de Categoría
+class Categoria(Base):
+    __tablename__ = 'categorias'
+    
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String(100), unique=True, nullable=False)
+    descripcion = Column(String(255))
+    
+    # Relación con productos
+    productos = relationship('Producto', back_populates='categoria')
+    
+    def __repr__(self):
+        return f'&lt;Categoria {self.nombre}&gt;'
+
+# Modelo de Producto
+class Producto(Base):
+    __tablename__ = 'productos'
+    
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String(200), nullable=False)
+    precio = Column(Float, nullable=False)
+    stock = Column(Integer, default=0)
+    disponible = Column(Boolean, default=True)
+    fecha_creacion = Column(DateTime, default=datetime.utcnow)
+    
+    # Clave foránea
+    categoria_id = Column(Integer, ForeignKey('categorias.id'))
+    
+    # Relación
+    categoria = relationship('Categoria', back_populates='productos')
+    
+    def __repr__(self):
+        return f'&lt;Producto {self.nombre} - ${self.precio}&gt;'
+
+# Crear tablas
+Base.metadata.create_all(engine)
+
+# Crear sesión
+Session = sessionmaker(bind=engine)
+session = Session()
+
+def crear_datos_ejemplo():
+    """Crear datos de ejemplo"""
+    # Crear categorías
+    electronica = Categoria(nombre='Electrónica', descripcion='Productos electrónicos')
+    ropa = Categoria(nombre='Ropa', descripcion='Ropa y accesorios')
+    
+    session.add_all([electronica, ropa])
+    session.commit()
+    
+    # Crear productos
+    productos = [
+        Producto(nombre='Laptop Gaming', precio=1299.99, stock=10, categoria=electronica),
+        Producto(nombre='Smartphone', precio=699.99, stock=25, categoria=electronica),
+        Producto(nombre='Camiseta', precio=19.99, stock=50, categoria=ropa),
+        Producto(nombre='Libro Python', precio=39.99, stock=30, categoria=ropa)
+    ]
+    
+    session.add_all(productos)
+    session.commit()
+
+def consultar_productos():
+    """Consultar productos con sus categorías"""
+    productos = session.query(Producto).join(Categoria).all()
+    
+    for producto in productos:
+        print(f"{producto.nombre} - ${producto.precio} ({producto.categoria.nombre})")
+
+def buscar_por_categoria(nombre_categoria):
+    """Buscar productos por categoría"""
+    productos = session.query(Producto).join(Categoria)\
+        .filter(Categoria.nombre == nombre_categoria).all()
+    
+    return productos
+
+def actualizar_precio(producto_id, nuevo_precio):
+    """Actualizar precio de producto"""
+    producto = session.query(Producto).get(producto_id)
+    if producto:
+        producto.precio = nuevo_precio
+        session.commit()
+        print(f"Precio de {producto.nombre} actualizado a ${nuevo_precio}")
+
+def eliminar_producto(producto_id):
+    """Eliminar producto"""
+    producto = session.query(Producto).get(producto_id)
+    if producto:
+        session.delete(producto)
+        session.commit()
+        print(f"Producto {producto.nombre} eliminado")
+
+# Uso
+if __name__ == '__main__':
+    # Crear datos de ejemplo
+    crear_datos_ejemplo()
+    
+    # Consultar productos
+    print("=== TODOS LOS PRODUCTOS ===")
+    consultar_productos()
+    
+    # Buscar por categoría
+    print("\n=== PRODUCTOS DE ELECTRÓNICA ===")
+    electronicos = buscar_por_categoria('Electrónica')
+    for producto in electronicos:
+        print(f"{producto.nombre} - ${producto.precio}")
+    
+    # Actualizar precio
+    actualizar_precio(1, 1199.99)
+    
+    # Eliminar producto
+    eliminar_producto(4)
+    
+    session.close()</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Prácticos con SQLite</h2>
+            <h3>Gestor de Tareas Personal</h3>
+            <p>Aplicación de línea de comandos para gestionar tareas diarias con SQLite como backend.</p>
+
+            <h3>Base de Datos de Biblioteca</h3>
+            <p>Sistema para gestionar libros, autores, préstamos y usuarios de una biblioteca.</p>
+
+            <h3>Contabilidad Personal</h3>
+            <p>Aplicación para seguimiento de ingresos, gastos y presupuestos personales.</p>
+
+            <h3>Blog Personal</h3>
+            <p>Sistema de blog simple con artículos, categorías y comentarios almacenados en SQLite.</p>
+
+            <h3>Inventario de Tienda</h3>
+            <p>Sistema de inventario para tienda pequeña con productos, categorías y reportes.</p>
+        </section>
+    </div>
+</body>
+</html>

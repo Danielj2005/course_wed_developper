@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Node.js - Guía Completa</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: #339933; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #339933; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#instalacion">Instalación</a>
+            <a href="#modulos">Módulos</a>
+            <a href="#npm">NPM</a>
+            <a href="#servidor">Servidor HTTP</a>
+            <a href="#api">APIs REST</a>
+            <a href="#async">Async/Await</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>🟢 Node.js - Desarrollo Backend con JavaScript</h1>
+
+        <section id="intro" class="section">
+            <h2>Introducción a Node.js</h2>
+            <p>Node.js es un entorno de ejecución de JavaScript del lado del servidor que permite crear aplicaciones web escalables. Está construido sobre el motor V8 de Chrome y utiliza un modelo de I/O no bloqueante.</p>
+            <h3>¿Por qué Node.js?</h3>
+            <ul>
+                <li><strong>JavaScript Full-Stack:</strong> Mismo lenguaje en frontend y backend</li>
+                <li><strong>Alto rendimiento:</strong> I/O no bloqueante y event-driven</li>
+                <li><strong>Gran ecosistema:</strong> NPM con millones de paquetes</li>
+                <li><strong>Escalabilidad:</strong> Manejo eficiente de conexiones concurrentes</li>
+                <li><strong>Comunidad activa:</strong> Actualizaciones constantes y soporte</li>
+            </ul>
+        </section>
+
+        <section id="instalacion" class="section">
+            <h2>Instalación y Configuración</h2>
+            <h3>Instalación de Node.js</h3>
+            <div class="example">
+                <pre><code>// Verificar instalación
+node --version
+npm --version
+
+// Crear proyecto
+mkdir mi-proyecto
+cd mi-proyecto
+npm init -y
+
+// Estructura básica
+mi-proyecto/
+├── package.json
+├── index.js
+└── node_modules/</code></pre>
+            </div>
+
+            <h3>Primer Script</h3>
+            <div class="example">
+                <pre><code>// index.js
+console.log("¡Hola, Node.js!");
+
+// Ejecutar
+node index.js</code></pre>
+            </div>
+        </section>
+
+        <section id="modulos" class="section">
+            <h2>Módulos en Node.js</h2>
+            <h3>Módulos Built-in</h3>
+            <div class="example">
+                <pre><code>// Módulo File System (fs)
+const fs = require('fs');
+
+// Leer archivo de forma síncrona
+const data = fs.readFileSync('archivo.txt', 'utf8');
+console.log(data);
+
+// Leer archivo de forma asíncrona
+fs.readFile('archivo.txt', 'utf8', (err, data) => {
+    if (err) {
+        console.error('Error:', err);
+        return;
+    }
+    console.log(data);
+});
+
+// Escribir archivo
+fs.writeFile('nuevo.txt', 'Contenido nuevo', (err) => {
+    if (err) throw err;
+    console.log('Archivo creado');
+});
+
+// Módulo Path
+const path = require('path');
+const filePath = path.join(__dirname, 'carpeta', 'archivo.txt');
+console.log(filePath); // ruta completa
+
+// Módulo OS
+const os = require('os');
+console.log('Plataforma:', os.platform());
+console.log('Memoria libre:', os.freemem());
+console.log('CPUs:', os.cpus().length);</code></pre>
+            </div>
+
+            <h3>Módulos Personalizados</h3>
+            <div class="example">
+                <pre><code>// math.js
+function sumar(a, b) {
+    return a + b;
+}
+
+function restar(a, b) {
+    return a - b;
+}
+
+module.exports = {
+    sumar,
+    restar
+};
+
+// app.js
+const math = require('./math');
+console.log(math.sumar(5, 3)); // 8
+console.log(math.restar(10, 4)); // 6
+
+// ES6 Modules (requiere "type": "module" en package.json)
+// math.mjs
+export function sumar(a, b) {
+    return a + b;
+}
+
+// app.mjs
+import { sumar } from './math.mjs';
+console.log(sumar(5, 3));</code></pre>
+            </div>
+        </section>
+
+        <section id="npm" class="section">
+            <h2>Gestión de Paquetes con NPM</h2>
+            <h3>Comandos Básicos de NPM</h3>
+            <div class="example">
+                <pre><code>// Instalar paquetes
+npm install express          // Instalar Express
+npm install lodash --save    // Guardar en dependencies
+npm install nodemon --save-dev // Guardar en devDependencies
+
+// Instalar todas las dependencias
+npm install
+
+// Ver paquetes instalados
+npm list
+npm list --depth=0
+
+// Actualizar paquetes
+npm update
+npm update express
+
+// Desinstalar paquetes
+npm uninstall express
+
+// Verificar vulnerabilidades
+npm audit
+npm audit fix
+
+// Scripts personalizados en package.json
+{
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest"
+  }
+}
+
+// Ejecutar scripts
+npm start
+npm run dev</code></pre>
+            </div>
+
+            <h3>Paquetes Esenciales</h3>
+            <ul>
+                <li><strong>express:</strong> Framework web minimalista</li>
+                <li><strong>nodemon:</strong> Reinicio automático del servidor</li>
+                <li><strong>dotenv:</strong> Variables de entorno</li>
+                <li><strong>mongoose:</strong> ODM para MongoDB</li>
+                <li><strong>bcrypt:</strong> Hashing de contraseñas</li>
+                <li><strong>jsonwebtoken:</strong> Tokens JWT</li>
+                <li><strong>cors:</strong> Cross-Origin Resource Sharing</li>
+                <li><strong>helmet:</strong> Seguridad básica</li>
+            </ul>
+        </section>
+
+        <section id="servidor" class="section">
+            <h2>Servidor HTTP Básico</h2>
+            <div class="example">
+                <pre><code>const http = require('http');
+
+// Crear servidor
+const server = http.createServer((req, res) => {
+    // Configurar headers
+    res.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8'
+    });
+
+    // Routing básico
+    if (req.url === '/') {
+        res.end('<h1>Inicio</h1>');
+    } else if (req.url === '/about') {
+        res.end('<h1>Acerca de</h1>');
+    } else {
+        res.writeHead(404);
+        res.end('<h1>404 - Página no encontrada</h1>');
+    }
+});
+
+// Puerto del servidor
+const PORT = process.env.PORT || 3000;
+
+// Iniciar servidor
+server.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+});</code></pre>
+            </div>
+        </section>
+
+        <section id="api" class="section">
+            <h2>APIs REST con Express</h2>
+            <h3>Configuración Básica</h3>
+            <div class="example">
+                <pre><code>const express = require('express');
+const app = express();
+
+// Middleware para parsear JSON
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Middleware personalizado
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+    next();
+});
+
+// Rutas
+app.get('/', (req, res) => {
+    res.json({ mensaje: 'API funcionando' });
+});
+
+app.get('/api/usuarios', (req, res) => {
+    // Simular datos
+    const usuarios = [
+        { id: 1, nombre: 'Juan', email: 'juan@email.com' },
+        { id: 2, nombre: 'María', email: 'maria@email.com' }
+    ];
+    res.json(usuarios);
+});
+
+app.post('/api/usuarios', (req, res) => {
+    const { nombre, email } = req.body;
+
+    if (!nombre || !email) {
+        return res.status(400).json({ error: 'Nombre y email requeridos' });
+    }
+
+    const nuevoUsuario = {
+        id: Date.now(),
+        nombre,
+        email
+    };
+
+    res.status(201).json(nuevoUsuario);
+});
+
+app.put('/api/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+    const { nombre, email } = req.body;
+
+    // Lógica para actualizar usuario
+    res.json({ id, nombre, email, mensaje: 'Usuario actualizado' });
+});
+
+app.delete('/api/usuarios/:id', (req, res) => {
+    const { id } = req.params;
+    // Lógica para eliminar usuario
+    res.json({ mensaje: `Usuario ${id} eliminado` });
+});
+
+// Middleware de manejo de errores
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Algo salió mal' });
+});
+
+// Puerto
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor Express en http://localhost:${PORT}`);
+});</code></pre>
+            </div>
+
+            <h3>Middleware Avanzado</h3>
+            <div class="example">
+                <pre><code>// middleware/auth.js
+const jwt = require('jsonwebtoken');
+
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Token requerido' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Token inválido' });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+module.exports = { authenticateToken };
+
+// Uso en rutas
+const { authenticateToken } = require('./middleware/auth');
+
+app.get('/api/profile', authenticateToken, (req, res) => {
+    res.json({ user: req.user });
+});</code></pre>
+            </div>
+        </section>
+
+        <section id="async" class="section">
+            <h2>Programación Asíncrona</h2>
+            <h3>Callbacks</h3>
+            <div class="example">
+                <pre><code>// Callback hell (evitar)
+fs.readFile('archivo1.txt', 'utf8', (err, data1) => {
+    if (err) return console.error(err);
+    
+    fs.readFile('archivo2.txt', 'utf8', (err, data2) => {
+        if (err) return console.error(err);
+        
+        fs.writeFile('combinado.txt', data1 + data2, (err) => {
+            if (err) return console.error(err);
+            console.log('Archivos combinados');
+        });
+    });
+});</code></pre>
+            </div>
+
+            <h3>Promises</h3>
+            <div class="example">
+                <pre><code>const fs = require('fs').promises;
+
+const leerArchivo = (ruta) => {
+    return fs.readFile(ruta, 'utf8');
+};
+
+const escribirArchivo = (ruta, contenido) => {
+    return fs.writeFile(ruta, contenido);
+};
+
+// Usando Promises
+leerArchivo('archivo1.txt')
+    .then(data1 => {
+        return leerArchivo('archivo2.txt')
+            .then(data2 => {
+                return escribirArchivo('combinado.txt', data1 + data2);
+            });
+    })
+    .then(() => {
+        console.log('Archivos combinados exitosamente');
+    })
+    .catch(err => {
+        console.error('Error:', err);
+    });
+
+// Promise.all para operaciones paralelas
+Promise.all([
+    leerArchivo('archivo1.txt'),
+    leerArchivo('archivo2.txt'),
+    leerArchivo('archivo3.txt')
+])
+.then(resultados => {
+    const contenidoTotal = resultados.join('\n');
+    return escribirArchivo('todos.txt', contenidoTotal);
+})
+.then(() => console.log('Todos los archivos combinados'))
+.catch(err => console.error(err));</code></pre>
+            </div>
+
+            <h3>Async/Await</h3>
+            <div class="example">
+                <pre><code>const fs = require('fs').promises;
+
+async function procesarArchivos() {
+    try {
+        const data1 = await fs.readFile('archivo1.txt', 'utf8');
+        const data2 = await fs.readFile('archivo2.txt', 'utf8');
+        
+        const contenidoCombinado = data1 + '\n' + data2;
+        await fs.writeFile('combinado.txt', contenidoCombinado);
+        
+        console.log('Archivos procesados exitosamente');
+    } catch (error) {
+        console.error('Error procesando archivos:', error);
+    }
+}
+
+// Ejecutar función async
+procesarArchivos();
+
+// Con Promise.all para paralelismo
+async function procesarArchivosParalelo() {
+    try {
+        const [data1, data2, data3] = await Promise.all([
+            fs.readFile('archivo1.txt', 'utf8'),
+            fs.readFile('archivo2.txt', 'utf8'),
+            fs.readFile('archivo3.txt', 'utf8')
+        ]);
+        
+        const contenidoTotal = [data1, data2, data3].join('\n---\n');
+        await fs.writeFile('todos.txt', contenidoTotal);
+        
+        console.log('Todos los archivos procesados');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Prácticos</h2>
+            <h3>API REST Completa</h3>
+            <p>Crea una API REST completa con autenticación JWT, manejo de errores y documentación.</p>
+
+            <h3>Servidor de Archivos</h3>
+            <p>Construye un servidor para subir, descargar y gestionar archivos con autenticación.</p>
+
+            <h3>Chat en Tiempo Real</h3>
+            <p>Aplicación de chat usando WebSockets con Socket.io para comunicación bidireccional.</p>
+
+            <h3>Scraper Web</h3>
+            <p>Herramienta para extraer datos de websites usando librerías como Cheerio y Axios.</p>
+
+            <h3>API de Tareas</h3>
+            <div class="example">
+                <pre><code>// server.js
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const cors = require('cors');
+require('dotenv').config();
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Simulación de base de datos
+let tareas = [];
+let usuarios = [];
+
+// Middleware de autenticación
+const authenticateToken = (req, res, next) => {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Acceso denegado' });
+    }
+    
+    try {
+        const verified = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = verified;
+        next();
+    } catch (error) {
+        res.status(400).json({ error: 'Token inválido' });
+    }
+};
+
+// Rutas de autenticación
+app.post('/register', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        // Verificar si usuario existe
+        const usuarioExistente = usuarios.find(u => u.username === username);
+        if (usuarioExistente) {
+            return res.status(400).json({ error: 'Usuario ya existe' });
+        }
+        
+        // Hash de contraseña
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+        
+        // Crear usuario
+        const usuario = {
+            id: usuarios.length + 1,
+            username,
+            password: hashedPassword
+        };
+        
+        usuarios.push(usuario);
+        res.status(201).json({ message: 'Usuario registrado' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
+app.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        // Buscar usuario
+        const usuario = usuarios.find(u => u.username === username);
+        if (!usuario) {
+            return res.status(400).json({ error: 'Usuario no encontrado' });
+        }
+        
+        // Verificar contraseña
+        const validPassword = await bcrypt.compare(password, usuario.password);
+        if (!validPassword) {
+            return res.status(400).json({ error: 'Contraseña incorrecta' });
+        }
+        
+        // Crear token
+        const token = jwt.sign(
+            { id: usuario.id, username: usuario.username },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+        
+        res.json({ token });
+    } catch (error) {
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
+// Rutas de tareas (protegidas)
+app.get('/tareas', authenticateToken, (req, res) => {
+    const tareasUsuario = tareas.filter(t => t.usuarioId === req.user.id);
+    res.json(tareasUsuario);
+});
+
+app.post('/tareas', authenticateToken, (req, res) => {
+    const { titulo, descripcion } = req.body;
+    
+    const nuevaTarea = {
+        id: tareas.length + 1,
+        titulo,
+        descripcion,
+        completada: false,
+        usuarioId: req.user.id,
+        fechaCreacion: new Date()
+    };
+    
+    tareas.push(nuevaTarea);
+    res.status(201).json(nuevaTarea);
+});
+
+app.put('/tareas/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    const { titulo, descripcion, completada } = req.body;
+    
+    const tareaIndex = tareas.findIndex(t => t.id == id && t.usuarioId === req.user.id);
+    
+    if (tareaIndex === -1) {
+        return res.status(404).json({ error: 'Tarea no encontrada' });
+    }
+    
+    tareas[tareaIndex] = {
+        ...tareas[tareaIndex],
+        titulo: titulo || tareas[tareaIndex].titulo,
+        descripcion: descripcion || tareas[tareaIndex].descripcion,
+        completada: completada !== undefined ? completada : tareas[tareaIndex].completada
+    };
+    
+    res.json(tareas[tareaIndex]);
+});
+
+app.delete('/tareas/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    
+    const tareaIndex = tareas.findIndex(t => t.id == id && t.usuarioId === req.user.id);
+    
+    if (tareaIndex === -1) {
+        return res.status(404).json({ error: 'Tarea no encontrada' });
+    }
+    
+    tareas.splice(tareaIndex, 1);
+    res.json({ message: 'Tarea eliminada' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
+});</code></pre>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

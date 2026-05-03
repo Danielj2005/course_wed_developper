@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB - Base de Datos NoSQL</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: #47a248; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #47a248; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#instalacion">Instalación</a>
+            <a href="#conexion">Conexión</a>
+            <a href="#crud">CRUD</a>
+            <a href="#queries">Consultas</a>
+            <a href="#agregacion">Agregación</a>
+            <a href="#relaciones">Relaciones</a>
+            <a href="#mongoose">Mongoose</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>🍃 MongoDB - Base de Datos NoSQL</h1>
+
+        <section id="intro" class="section">
+            <h2>Introducción a MongoDB</h2>
+            <p>MongoDB es una base de datos NoSQL orientada a documentos que almacena datos en formato BSON (JSON binario). Es altamente escalable y flexible.</p>
+            <h3>¿Por qué MongoDB?</h3>
+            <ul>
+                <li><strong>Esquema flexible:</strong> No requiere estructura fija de tablas</li>
+                <li><strong>Escalable horizontalmente:</strong> Sharding automático</li>
+                <li><strong>Alta performance:</strong> Índices eficientes y consultas rápidas</li>
+                <li><strong>JSON-like:</strong> Documentos similares a objetos JavaScript</li>
+                <li><strong>Replicación:</strong> Alta disponibilidad con replica sets</li>
+                <li><strong>Rich queries:</strong> Consultas avanzadas y agregaciones</li>
+            </ul>
+            <h3>Conceptos Básicos</h3>
+            <ul>
+                <li><strong>Documento:</strong> Unidad básica de datos (similar a fila en SQL)</li>
+                <li><strong>Colección:</strong> Grupo de documentos (similar a tabla en SQL)</li>
+                <li><strong>Base de datos:</strong> Contenedor de colecciones</li>
+                <li><strong>BSON:</strong> Formato binario para almacenar documentos</li>
+                <li><strong>ObjectId:</strong> Identificador único de 12 bytes</li>
+            </ul>
+        </section>
+
+        <section id="instalacion" class="section">
+            <h2>Instalación y Configuración</h2>
+            <h3>Instalación Local</h3>
+            <div class="example">
+                <pre><code># Windows (usando Chocolatey)
+choco install mongodb
+
+# macOS (usando Homebrew)
+brew install mongodb-community
+
+# Linux (Ubuntu)
+sudo apt-get install mongodb
+
+# Iniciar MongoDB
+sudo systemctl start mongodb
+sudo systemctl enable mongodb
+
+# Verificar instalación
+mongo --version
+mongod --version</code></pre>
+            </div>
+
+            <h3>MongoDB Atlas (Cloud)</h3>
+            <div class="example">
+                <pre><code>1. Ir a https://www.mongodb.com/atlas
+2. Crear cuenta gratuita
+3. Crear nuevo cluster
+4. Configurar usuario y whitelist de IP
+5. Obtener connection string:
+   mongodb+srv://usuario:password@cluster.mongodb.net/dbname</code></pre>
+            </div>
+
+            <h3>MongoDB Compass (GUI)</h3>
+            <p>Interfaz gráfica para gestionar MongoDB. Descargar desde mongodb.com/products/compass</p>
+        </section>
+
+        <section id="conexion" class="section">
+            <h2>Conexión con Node.js</h2>
+            <h3>Driver Nativo de MongoDB</h3>
+            <div class="example">
+                <pre><code>const { MongoClient } = require('mongodb');
+
+// Connection URL
+const url = 'mongodb://localhost:27017';
+const client = new MongoClient(url);
+
+// Database Name
+const dbName = 'mi_base_datos';
+
+async function connectToMongo() {
+    try {
+        // Conectar al servidor
+        await client.connect();
+        console.log('Conectado a MongoDB');
+        
+        const db = client.db(dbName);
+        
+        // Realizar operaciones...
+        
+    } catch (error) {
+        console.error('Error de conexión:', error);
+    } finally {
+        // Cerrar conexión
+        await client.close();
+        console.log('Conexión cerrada');
+    }
+}
+
+connectToMongo();</code></pre>
+            </div>
+
+            <h3>Conexión con Variables de Entorno</h3>
+            <div class="example">
+                <pre><code>// .env
+MONGODB_URI=mongodb://localhost:27017/mi_app
+DB_NAME=mi_app
+
+// config/database.js
+const { MongoClient } = require('mongodb');
+require('dotenv').config();
+
+class Database {
+    constructor() {
+        this.client = new MongoClient(process.env.MONGODB_URI);
+        this.dbName = process.env.DB_NAME;
+        this.db = null;
+    }
+
+    async connect() {
+        try {
+            await this.client.connect();
+            this.db = this.client.db(this.dbName);
+            console.log('Conectado a MongoDB');
+        } catch (error) {
+            console.error('Error de conexión:', error);
+            throw error;
+        }
+    }
+
+    getDb() {
+        return this.db;
+    }
+
+    async close() {
+        await this.client.close();
+        console.log('Conexión cerrada');
+    }
+}
+
+module.exports = new Database();</code></pre>
+            </div>
+        </section>
+
+        <section id="crud" class="section">
+            <h2>Operaciones CRUD</h2>
+            <h3>Crear (Create)</h3>
+            <div class="example">
+                <pre><code>const { MongoClient } = require('mongodb');
+
+async function crearDocumentos() {
+    const client = new MongoClient('mongodb://localhost:27017');
+    
+    try {
+        await client.connect();
+        const db = client.db('mi_app');
+        const usuarios = db.collection('usuarios');
+        
+        // Insertar un documento
+        const usuario = {
+            nombre: 'Juan Pérez',
+            email: 'juan@email.com',
+            edad: 30,
+            fechaRegistro: new Date(),
+            activo: true,
+            hobbies: ['leer', 'programar', 'deportes'],
+            direccion: {
+                calle: 'Calle Principal 123',
+                ciudad: 'Madrid',
+                pais: 'España'
+            }
+        };
+        
+        const resultado = await usuarios.insertOne(usuario);
+        console.log('Documento insertado:', resultado.insertedId);
+        
+        // Insertar múltiples documentos
+        const nuevosUsuarios = [
+            { nombre: 'María García', email: 'maria@email.com', edad: 25 },
+            { nombre: 'Carlos López', email: 'carlos@email.com', edad: 35 },
+            { nombre: 'Ana Rodríguez', email: 'ana@email.com', edad: 28 }
+        ];
+        
+        const resultadoMultiple = await usuarios.insertMany(nuevosUsuarios);
+        console.log('Documentos insertados:', resultadoMultiple.insertedCount);
+        
+    } finally {
+        await client.close();
+    }
+}
+
+crearDocumentos();</code></pre>
+            </div>
+
+            <h3>Leer (Read)</h3>
+            <div class="example">
+                <pre><code>async function leerDocumentos() {
+    const client = new MongoClient('mongodb://localhost:27017');
+    
+    try {
+        await client.connect();
+        const db = client.db('mi_app');
+        const usuarios = db.collection('usuarios');
+        
+        // Encontrar todos los documentos
+        const todosUsuarios = await usuarios.find({}).toArray();
+        console.log('Todos los usuarios:', todosUsuarios);
+        
+        // Encontrar con filtro
+        const usuarioActivo = await usuarios.findOne({ activo: true });
+        console.log('Usuario activo:', usuarioActivo);
+        
+        // Encontrar con múltiples condiciones
+        const usuariosMayores = await usuarios.find({ 
+            edad: { $gte: 25 },
+            activo: true 
+        }).toArray();
+        
+        // Proyección (seleccionar campos específicos)
+        const nombresEmails = await usuarios.find({})
+            .project({ nombre: 1, email: 1, _id: 0 })
+            .toArray();
+        
+        // Ordenar y limitar
+        const usuariosOrdenados = await usuarios.find({})
+            .sort({ edad: -1 }) // Orden descendente por edad
+            .limit(5)
+            .toArray();
+        
+        // Contar documentos
+        const totalUsuarios = await usuarios.countDocuments();
+        const usuariosActivos = await usuarios.countDocuments({ activo: true });
+        
+    } finally {
+        await client.close();
+    }
+}</code></pre>
+            </div>
+
+            <h3>Actualizar (Update)</h3>
+            <div class="example">
+                <pre><code>async function actualizarDocumentos() {
+    const client = new MongoClient('mongodb://localhost:27017');
+    
+    try {
+        await client.connect();
+        const db = client.db('mi_app');
+        const usuarios = db.collection('usuarios');
+        
+        // Actualizar un documento
+        const resultado = await usuarios.updateOne(
+            { email: 'juan@email.com' }, // Filtro
+            { 
+                $set: { 
+                    edad: 31,
+                    ultimoLogin: new Date()
+                },
+                $push: {
+                    hobbies: 'viajar'
+                }
+            } // Actualización
+        );
+        
+        console.log('Documento actualizado:', resultado.modifiedCount);
+        
+        // Actualizar múltiples documentos
+        await usuarios.updateMany(
+            { activo: true },
+            { $set: { ultimoAcceso: new Date() } }
+        );
+        
+        // Reemplazar documento completo
+        await usuarios.replaceOne(
+            { email: 'maria@email.com' },
+            {
+                nombre: 'María González',
+                email: 'maria@email.com',
+                edad: 26,
+                activo: true,
+                fechaRegistro: new Date()
+            }
+        );
+        
+    } finally {
+        await client.close();
+    }
+}</code></pre>
+            </div>
+
+            <h3>Eliminar (Delete)</h3>
+            <div class="example">
+                <pre><code>async function eliminarDocumentos() {
+    const client = new MongoClient('mongodb://localhost:27017');
+    
+    try {
+        await client.connect();
+        const db = client.db('mi_app');
+        const usuarios = db.collection('usuarios');
+        
+        // Eliminar un documento
+        const resultado = await usuarios.deleteOne({ email: 'carlos@email.com' });
+        console.log('Documento eliminado:', resultado.deletedCount);
+        
+        // Eliminar múltiples documentos
+        const resultadoMultiple = await usuarios.deleteMany({ activo: false });
+        console.log('Documentos eliminados:', resultadoMultiple.deletedCount);
+        
+        // Eliminar colección completa
+        await db.dropCollection('usuarios_temporales');
+        
+        // Eliminar base de datos completa
+        await client.db('base_datos_temporal').dropDatabase();
+        
+    } finally {
+        await client.close();
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="queries" class="section">
+            <h2>Consultas Avanzadas</h2>
+            <h3>Operadores de Consulta</h3>
+            <div class="example">
+                <pre><code>// Operadores de comparación
+db.usuarios.find({ edad: { $gt: 25 } })     // Mayor que
+db.usuarios.find({ edad: { $gte: 25 } })    // Mayor o igual
+db.usuarios.find({ edad: { $lt: 30 } })     // Menor que
+db.usuarios.find({ edad: { $lte: 30 } })    // Menor o igual
+db.usuarios.find({ edad: { $ne: 25 } })     // No igual
+db.usuarios.find({ edad: { $in: [20, 25, 30] } }) // En array
+db.usuarios.find({ edad: { $nin: [20, 25] } })    // No en array
+
+// Operadores lógicos
+db.usuarios.find({ $and: [{ edad: { $gte: 20 } }, { activo: true }] })
+db.usuarios.find({ $or: [{ edad: { $lt: 25 } }, { ciudad: "Madrid" }] })
+db.usuarios.find({ $nor: [{ edad: { $lt: 20 } }, { activo: false }] })
+db.usuarios.find({ activo: { $not: { $eq: false } } })
+
+// Operadores de elementos
+db.usuarios.find({ hobbies: { $exists: true } })    // Campo existe
+db.usuarios.find({ hobbies: { $size: 3 } })         // Array de tamaño 3
+db.usuarios.find({ "direccion.ciudad": { $exists: true } }) // Subdocumento
+
+// Operadores de arrays
+db.usuarios.find({ hobbies: "programar" })          // Contiene elemento
+db.usuarios.find({ hobbies: { $all: ["leer", "programar"] } }) // Contiene todos
+db.usuarios.find({ hobbies: { $elemMatch: { $eq: "deportes" } } })
+
+// Regex
+db.usuarios.find({ email: { $regex: /@gmail\.com$/ } })
+db.usuarios.find({ nombre: { $regex: /^Juan/, $options: 'i' } })
+
+// Consultas geoespaciales
+db.lugares.find({
+    location: {
+        $near: {
+            $geometry: { type: "Point", coordinates: [-73.9667, 40.78] },
+            $maxDistance: 1000
+        }
+    }
+})</code></pre>
+            </div>
+
+            <h3>Índices</h3>
+            <div class="example">
+                <pre><code>// Crear índices
+db.usuarios.createIndex({ email: 1 })                    // Índice simple
+db.usuarios.createIndex({ nombre: 1, apellido: 1 })      // Índice compuesto
+db.usuarios.createIndex({ email: 1 }, { unique: true })  // Índice único
+db.usuarios.createIndex({ location: "2dsphere" })        // Índice geoespacial
+
+// Índices de texto
+db.articulos.createIndex({ titulo: "text", contenido: "text" })
+
+// Buscar con índices de texto
+db.articulos.find({ $text: { $search: "mongodb tutorial" } })
+
+// Ver índices existentes
+db.usuarios.getIndexes()
+
+// Eliminar índice
+db.usuarios.dropIndex({ email: 1 })
+
+// Explicar consulta (ver si usa índice)
+db.usuarios.find({ email: "usuario@email.com" }).explain("executionStats")</code></pre>
+            </div>
+        </section>
+
+        <section id="agregacion" class="section">
+            <h2>Framework de Agregación</h2>
+            <h3>Pipeline de Agregación</h3>
+            <div class="example">
+                <pre><code>// $match - Filtrar documentos
+db.ventas.aggregate([
+    { $match: { fecha: { $gte: ISODate("2024-01-01") } } }
+])
+
+// $group - Agrupar documentos
+db.ventas.aggregate([
+    {
+        $group: {
+            _id: "$producto",
+            totalVentas: { $sum: "$cantidad" },
+            ingresosTotales: { $sum: { $multiply: ["$cantidad", "$precio"] } },
+            promedioPrecio: { $avg: "$precio" }
+        }
+    }
+])
+
+// $project - Reformatear documentos
+db.usuarios.aggregate([
+    {
+        $project: {
+            nombreCompleto: { $concat: ["$nombre", " ", "$apellido"] },
+            edad: 1,
+            email: 1,
+            _id: 0
+        }
+    }
+])
+
+// $sort - Ordenar
+db.productos.aggregate([
+    { $sort: { precio: -1, nombre: 1 } }
+])
+
+// $limit y $skip - Paginación
+db.productos.aggregate([
+    { $sort: { precio: -1 } },
+    { $skip: 10 },
+    { $limit: 5 }
+])
+
+// Pipeline completo
+db.pedidos.aggregate([
+    // 1. Filtrar pedidos del último mes
+    {
+        $match: {
+            fecha: { $gte: new Date(Date.now() - 30*24*60*60*1000) },
+            estado: "completado"
+        }
+    },
+    
+    // 2. Unir con colección de usuarios
+    {
+        $lookup: {
+            from: "usuarios",
+            localField: "usuarioId",
+            foreignField: "_id",
+            as: "usuario"
+        }
+    },
+    
+    // 3. Desenrollar array de usuario
+    { $unwind: "$usuario" },
+    
+    // 4. Agrupar por ciudad
+    {
+        $group: {
+            _id: "$usuario.direccion.ciudad",
+            totalPedidos: { $sum: 1 },
+            ingresosTotales: { $sum: "$total" },
+            clientesUnicos: { $addToSet: "$usuarioId" }
+        }
+    },
+    
+    // 5. Calcular número de clientes únicos
+    {
+        $project: {
+            ciudad: "$_id",
+            totalPedidos: 1,
+            ingresosTotales: 1,
+            numClientes: { $size: "$clientesUnicos" },
+            promedioPorCliente: { $divide: ["$ingresosTotales", { $size: "$clientesUnicos" }] }
+        }
+    },
+    
+    // 6. Ordenar por ingresos
+    { $sort: { ingresosTotales: -1 } }
+])</code></pre>
+            </div>
+
+            <h3>Operadores de Agregación Comunes</h3>
+            <div class="example">
+                <pre><code>// Operadores aritméticos
+{ $add: ["$precio", "$impuesto"] }
+{ $subtract: ["$precio", "$descuento"] }
+{ $multiply: ["$cantidad", "$precio"] }
+{ $divide: ["$total", "$cantidad"] }
+{ $mod: ["$numero", 2] }
+
+// Operadores de comparación
+{ $eq: ["$estado", "activo"] }
+{ $gt: ["$edad", 18] }
+{ $gte: ["$puntuacion", 80] }
+
+// Operadores de fecha
+{ $year: "$fechaNacimiento" }
+{ $month: "$fechaRegistro" }
+{ $dayOfMonth: "$fechaCompra" }
+
+// Operadores de strings
+{ $concat: ["$nombre", " ", "$apellido"] }
+{ $toLower: "$email" }
+{ $substr: ["$descripcion", 0, 100] }
+
+// Operadores de arrays
+{ $size: "$hobbies" }
+{ $in: ["programar", "$hobbies"] }
+{ $push: "$etiquetas" }
+
+// Operadores condicionales
+{
+    $cond: {
+        if: { $gte: ["$edad", 18] },
+        then: "adulto",
+        else: "menor"
+    }
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="relaciones" class="section">
+            <h2>Relaciones y Referencias</h2>
+            <h3>Referencias Manuales</h3>
+            <div class="example">
+                <pre><code>// Documentos referenciados
+// Colección: autores
+{
+    _id: ObjectId("507f1f77bcf86cd799439011"),
+    nombre: "Gabriel García Márquez",
+    pais: "Colombia"
+}
+
+// Colección: libros
+{
+    _id: ObjectId("507f1f77bcf86cd799439012"),
+    titulo: "Cien años de soledad",
+    autorId: ObjectId("507f1f77bcf86cd799439011"), // Referencia
+    anio: 1967,
+    genero: "Novela"
+}
+
+// Consulta con populate manual
+const libro = await db.libros.findOne({ titulo: "Cien años de soledad" });
+const autor = await db.autores.findOne({ _id: libro.autorId });
+
+// $lookup para joins
+db.libros.aggregate([
+    {
+        $lookup: {
+            from: "autores",
+            localField: "autorId",
+            foreignField: "_id",
+            as: "autor"
+        }
+    },
+    {
+        $unwind: "$autor"
+    }
+])</code></pre>
+            </div>
+
+            <h3>Documentos Embebidos</h3>
+            <div class="example">
+                <pre><code>// Documento embebido
+{
+    _id: ObjectId("507f1f77bcf86cd799439013"),
+    titulo: "El principito",
+    autor: {
+        nombre: "Antoine de Saint-Exupéry",
+        pais: "Francia",
+        fechaNacimiento: ISODate("1900-06-29")
+    },
+    editorial: {
+        nombre: "Reynal & Hitchcock",
+        anioPublicacion: 1943
+    },
+    reseñas: [
+        {
+            usuario: "Juan Pérez",
+            calificacion: 5,
+            comentario: "Excelente libro",
+            fecha: ISODate("2024-01-15")
+        },
+        {
+            usuario: "María García",
+            calificacion: 4,
+            comentario: "Muy bonito",
+            fecha: ISODate("2024-01-20")
+        }
+    ]
+}
+
+// Consultas en documentos embebidos
+db.libros.find({ "autor.pais": "Francia" })
+db.libros.find({ "reseñas.calificacion": { $gte: 4 } })
+
+// Actualizar campos embebidos
+db.libros.updateOne(
+    { titulo: "El principito" },
+    { $set: { "autor.fechaNacimiento": ISODate("1900-06-29") } }
+)
+
+// Agregar reseña
+db.libros.updateOne(
+    { titulo: "El principito" },
+    { 
+        $push: { 
+            reseñas: {
+                usuario: "Carlos López",
+                calificacion: 5,
+                comentario: "Clásico imprescindible",
+                fecha: new Date()
+            }
+        }
+    }
+)</code></pre>
+            </div>
+        </section>
+
+        <section id="mongoose" class="section">
+            <h2>Mongoose - ODM para MongoDB</h2>
+            <h3>Instalación y Configuración</h3>
+            <div class="example">
+                <pre><code>npm install mongoose
+
+// Conexión con Mongoose
+const mongoose = require('mongoose');
+
+async function conectarDB() {
+    try {
+        await mongoose.connect('mongodb://localhost:27017/mi_app', {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useCreateIndex: true,
+            useFindAndModify: false
+        });
+        console.log('Conectado a MongoDB con Mongoose');
+    } catch (error) {
+        console.error('Error de conexión:', error);
+    }
+}
+
+conectarDB();</code></pre>
+            </div>
+
+            <h3>Esquemas y Modelos</h3>
+            <div class="example">
+                <pre><code>const mongoose = require('mongoose');
+
+// Esquema de Usuario
+const usuarioSchema = new mongoose.Schema({
+    nombre: {
+        type: String,
+        required: [true, 'El nombre es obligatorio'],
+        trim: true,
+        maxlength: [50, 'El nombre no puede exceder 50 caracteres']
+    },
+    email: {
+        type: String,
+        required: [true, 'El email es obligatorio'],
+        unique: true,
+        lowercase: true,
+        validate: {
+            validator: function(email) {
+                return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email);
+            },
+            message: 'Email inválido'
+        }
+    },
+    password: {
+        type: String,
+        required: [true, 'La contraseña es obligatoria'],
+        minlength: [6, 'La contraseña debe tener al menos 6 caracteres'],
+        select: false // No incluir en consultas por defecto
+    },
+    edad: {
+        type: Number,
+        min: [0, 'La edad no puede ser negativa'],
+        max: [120, 'Edad no válida']
+    },
+    activo: {
+        type: Boolean,
+        default: true
+    },
+    rol: {
+        type: String,
+        enum: ['usuario', 'moderador', 'admin'],
+        default: 'usuario'
+    },
+    fechaRegistro: {
+        type: Date,
+        default: Date.now
+    },
+    ultimoLogin: Date,
+    avatar: String,
+    hobbies: [String],
+    direccion: {
+        calle: String,
+        ciudad: String,
+        pais: {
+            type: String,
+            default: 'España'
+        }
+    }
+}, {
+    timestamps: true, // Agrega createdAt y updatedAt
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+// Índices
+usuarioSchema.index({ email: 1 });
+usuarioSchema.index({ nombre: 1, apellido: 1 });
+
+// Virtual para nombre completo
+usuarioSchema.virtual('nombreCompleto').get(function() {
+    return `${this.nombre}`;
+});
+
+// Método de instancia
+usuarioSchema.methods.verificarPassword = function(password) {
+    return this.password === password; // En producción usar bcrypt
+};
+
+// Método estático
+usuarioSchema.statics.buscarPorEmail = function(email) {
+    return this.findOne({ email: email.toLowerCase() });
+};
+
+// Middleware pre-save
+usuarioSchema.pre('save', function(next) {
+    if (this.isModified('password')) {
+        // En producción hashear contraseña
+        console.log('Password modificada, hasheando...');
+    }
+    next();
+});
+
+// Crear modelo
+const Usuario = mongoose.model('Usuario', usuarioSchema);
+
+module.exports = Usuario;</code></pre>
+            </div>
+
+            <h3>Operaciones CRUD con Mongoose</h3>
+            <div class="example">
+                <pre><code>const Usuario = require('./models/Usuario');
+
+// Crear usuario
+const crearUsuario = async () => {
+    try {
+        const usuario = new Usuario({
+            nombre: 'Juan Pérez',
+            email: 'juan@email.com',
+            password: '123456',
+            edad: 30,
+            hobbies: ['programar', 'leer']
+        });
+        
+        const usuarioGuardado = await usuario.save();
+        console.log('Usuario creado:', usuarioGuardado);
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+};
+
+// Buscar usuarios
+const buscarUsuarios = async () => {
+    try {
+        // Buscar todos
+        const usuarios = await Usuario.find();
+        
+        // Buscar con filtro
+        const usuarioActivo = await Usuario.findOne({ activo: true });
+        
+        // Buscar con proyección
+        const nombres = await Usuario.find().select('nombre email');
+        
+        // Buscar con populate (si hay referencias)
+        const usuarioConDatos = await Usuario.findById(id).populate('posts');
+        
+        // Usar método estático
+        const usuarioPorEmail = await Usuario.buscarPorEmail('juan@email.com');
+        
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+};
+
+// Actualizar usuario
+const actualizarUsuario = async (id) => {
+    try {
+        const usuarioActualizado = await Usuario.findByIdAndUpdate(
+            id,
+            { 
+                edad: 31,
+                ultimoLogin: new Date()
+            },
+            { new: true, runValidators: true }
+        );
+        
+        console.log('Usuario actualizado:', usuarioActualizado);
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+};
+
+// Eliminar usuario
+const eliminarUsuario = async (id) => {
+    try {
+        await Usuario.findByIdAndDelete(id);
+        console.log('Usuario eliminado');
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+};</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Prácticos con MongoDB</h2>
+            <h3>API REST con MongoDB</h3>
+            <p>Construye una API REST completa usando Express, MongoDB y Mongoose.</p>
+
+            <h3>Sistema de Blog</h3>
+            <p>Aplicación de blog con artículos, comentarios, categorías y usuarios.</p>
+
+            <h3>E-commerce Database</h3>
+            <p>Base de datos para tienda online con productos, pedidos, inventario y usuarios.</p>
+
+            <h3>Red Social</h3>
+            <p>Plataforma de red social con usuarios, posts, likes, comentarios y seguidores.</p>
+
+            <h3>Analytics System</h3>
+            <p>Sistema de analíticas web con tracking de eventos, métricas y reportes.</p>
+        </section>
+    </div>
+</body>
+</html>

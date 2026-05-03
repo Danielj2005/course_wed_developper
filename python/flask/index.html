@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask - Microframework Python</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: #000000; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; font-weight: bold; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #000000; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#instalacion">Instalación</a>
+            <a href="#routing">Routing</a>
+            <a href="#templates">Templates</a>
+            <a href="#forms">Forms</a>
+            <a href="#database">Base de Datos</a>
+            <a href="#auth">Autenticación</a>
+            <a href="#api">APIs</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>⚫ Flask - Microframework para Python</h1>
+
+        <section id="intro" class="section">
+            <h2>Introducción a Flask</h2>
+            <p>Flask es un microframework web ligero y flexible para Python. Es minimalista pero extensible, ideal para APIs, prototipos y aplicaciones pequeñas a medianas.</p>
+            <h3>¿Por qué Flask?</h3>
+            <ul>
+                <li><strong>Minimalista:</strong> Solo lo esencial, extensible con blueprints</li>
+                <li><strong>Flexible:</strong> Libertad total para elegir herramientas</li>
+                <li><strong>Jinja2:</strong> Potente sistema de templates</li>
+                <li><strong>Werkzeug:</strong> Librería WSGI robusta</li>
+                <li><strong>Comunidad:</strong> Miles de extensiones disponibles</li>
+                <li><strong>Debugging:</strong> Servidor de desarrollo con recarga automática</li>
+            </ul>
+        </section>
+
+        <section id="instalacion" class="section">
+            <h2>Instalación y Primera App</h2>
+            <div class="example">
+                <pre><code># Crear entorno virtual
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate   # Windows
+
+# Instalar Flask
+pip install flask
+
+# app.py
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return '¡Hola desde Flask!'
+
+@app.route('/about')
+def about():
+    return '&lt;h1&gt;Acerca de&lt;/h1&gt;'
+
+if __name__ == '__main__':
+    app.run(debug=True)</code></pre>
+            </div>
+
+            <h3>Estructura de Proyecto Recomendada</h3>
+            <div class="example">
+                <pre><code>mi_proyecto/
+├── app/
+│   ├── __init__.py
+│   ├── routes.py
+│   ├── models.py
+│   ├── forms.py
+│   ├── templates/
+│   │   ├── base.html
+│   │   └── index.html
+│   └── static/
+│       ├── css/
+│       └── js/
+├── config.py
+├── run.py
+├── requirements.txt
+└── README.md</code></pre>
+            </div>
+        </section>
+
+        <section id="routing" class="section">
+            <h2>Sistema de Routing</h2>
+            <h3>Rutas Básicas y Parámetros</h3>
+            <div class="example">
+                <pre><code>from flask import Flask, request, redirect, url_for
+
+app = Flask(__name__)
+
+# Ruta básica
+@app.route('/')
+def index():
+    return 'Página principal'
+
+# Ruta con parámetro de cadena
+@app.route('/usuario/<nombre>')
+def usuario(nombre):
+    return f'Perfil de {nombre}'
+
+# Parámetros numéricos
+@app.route('/producto/<int:id>')
+def producto(id):
+    return f'Producto ID: {id}'
+
+# Parámetros flotantes
+@app.route('/precio/<float:precio>')
+def precio(precio):
+    return f'Precio: ${precio:.2f}'
+
+# Parámetros con validación UUID
+from werkzeug.routing import UUIDConverter
+app.url_map.converters['uuid'] = UUIDConverter
+
+@app.route('/recurso/<uuid:id>')
+def recurso(id):
+    return f'Recurso UUID: {id}'
+
+# Múltiples métodos HTTP
+@app.route('/api/data', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def api_data():
+    if request.method == 'GET':
+        return {'mensaje': 'Datos obtenidos'}
+    elif request.method == 'POST':
+        data = request.get_json()
+        return {'mensaje': 'Datos creados', 'data': data}
+    elif request.method == 'PUT':
+        data = request.get_json()
+        return {'mensaje': 'Datos actualizados', 'data': data}
+    else:  # DELETE
+        return {'mensaje': 'Datos eliminados'}
+
+# Redirecciones
+@app.route('/old-page')
+def old_page():
+    return redirect(url_for('index'))
+
+# Manejo de errores
+@app.errorhandler(404)
+def page_not_found(e):
+    return 'Página no encontrada', 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return 'Error interno del servidor', 500</code></pre>
+            </div>
+
+            <h3>Blueprints - Organización Modular</h3>
+            <div class="example">
+                <pre><code># app/auth/routes.py
+from flask import Blueprint, render_template, redirect, url_for, flash, request
+from werkzeug.security import generate_password_hash, check_password_hash
+
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        # Lógica de autenticación
+        if username == 'admin' and password == 'password':
+            flash('Login exitoso', 'success')
+            return redirect(url_for('main.index'))
+        else:
+            flash('Credenciales inválidas', 'error')
+    
+    return render_template('auth/login.html')
+
+@auth_bp.route('/logout')
+def logout():
+    # Lógica de logout
+    flash('Sesión cerrada', 'info')
+    return redirect(url_for('main.index'))
+
+# app/main/routes.py
+from flask import Blueprint, render_template
+
+main_bp = Blueprint('main', __name__)
+
+@main_bp.route('/')
+def index():
+    return render_template('main/index.html')
+
+@main_bp.route('/about')
+def about():
+    return render_template('main/about.html')
+
+# app/__init__.py
+from flask import Flask
+from .auth.routes import auth_bp
+from .main.routes import main_bp
+
+def create_app():
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'tu_clave_secreta'
+    
+    # Registrar blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(main_bp)
+    
+    return app</code></pre>
+            </div>
+        </section>
+
+        <section id="templates" class="section">
+            <h2>Templates con Jinja2</h2>
+            <h3>Configuración y Estructura</h3>
+            <div class="example">
+                <pre><code>from flask import Flask, render_template
+
+app = Flask(__name__)
+
+# Configuración de templates
+app.config['TEMPLATES_AUTO_RELOAD'] = True  # Recarga automática en desarrollo
+
+@app.route('/')
+def index():
+    usuarios = [
+        {'nombre': 'Juan', 'edad': 25, 'ciudad': 'Madrid'},
+        {'nombre': 'María', 'edad': 30, 'ciudad': 'Barcelona'},
+        {'nombre': 'Pedro', 'edad': 35, 'ciudad': 'Valencia'}
+    ]
+    
+    return render_template('index.html', 
+                         titulo='Mi App Flask',
+                         usuarios=usuarios,
+                         fecha_actual='2024-01-15')</code></pre>
+            </div>
+
+            <h3>Template Base y Herencia</h3>
+            <div class="example">
+                <pre><code>&lt;!-- templates/base.html --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block title %}Mi App Flask{% endblock %}&lt;/title&gt;
+    
+    &lt;!-- Bootstrap CSS --&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+    
+    {% block head %}{% endblock %}
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark"&gt;
+        &lt;div class="container"&gt;
+            &lt;a class="navbar-brand" href="{{ url_for('index') }}"&gt;Mi App&lt;/a&gt;
+            
+            &lt;div class="navbar-nav ms-auto"&gt;
+                &lt;a class="nav-link" href="{{ url_for('index') }}"&gt;Inicio&lt;/a&gt;
+                &lt;a class="nav-link" href="{{ url_for('about') }}"&gt;Nosotros&lt;/a&gt;
+                {% if current_user.is_authenticated %}
+                    &lt;a class="nav-link" href="{{ url_for('logout') }}"&gt;Salir&lt;/a&gt;
+                {% else %}
+                    &lt;a class="nav-link" href="{{ url_for('login') }}"&gt;Entrar&lt;/a&gt;
+                {% endif %}
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+    
+    &lt;main class="container mt-4"&gt;
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    &lt;div class="alert alert-{{ 'danger' if category == 'error' else category }}"&gt;
+                        {{ message }}
+                    &lt;/div&gt;
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    &lt;/main&gt;
+    
+    &lt;footer class="bg-light text-center py-3 mt-5"&gt;
+        &lt;p class="mb-0"&gt;&amp;copy; 2024 Mi App Flask. Todos los derechos reservados.&lt;/p&gt;
+    &lt;/footer&gt;
+    
+    &lt;!-- Bootstrap JS --&gt;
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+    
+    {% block scripts %}{% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;
+
+&lt;!-- templates/index.html --&gt;
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+&lt;div class="row"&gt;
+    &lt;div class="col-md-12"&gt;
+        &lt;h1 class="mb-4"&gt;{{ titulo }}&lt;/h1&gt;
+        
+        &lt;div class="row"&gt;
+            {% for usuario in usuarios %}
+                &lt;div class="col-md-4 mb-4"&gt;
+                    &lt;div class="card h-100"&gt;
+                        &lt;div class="card-body"&gt;
+                            &lt;h5 class="card-title"&gt;{{ usuario.nombre }}&lt;/h5&gt;
+                            &lt;p class="card-text"&gt;
+                                Edad: {{ usuario.edad }} años&lt;br&gt;
+                                Ciudad: {{ usuario.ciudad }}
+                            &lt;/p&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            {% else %}
+                &lt;div class="col-12"&gt;
+                    &lt;div class="alert alert-info"&gt;No hay usuarios registrados.&lt;/div&gt;
+                &lt;/div&gt;
+            {% endfor %}
+        &lt;/div&gt;
+        
+        &lt;p class="mt-4"&gt;Fecha actual: {{ fecha_actual }}&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+{% endblock %}</code></pre>
+            </div>
+
+            <h3>Filtros y Funciones de Jinja2</h3>
+            <div class="example">
+                <pre><code>&lt;!-- templates/ejemplos.html --&gt;
+{% extends 'base.html' %}
+
+{% block content %}
+&lt;h2&gt;Ejemplos de Filtros y Funciones&lt;/h2&gt;
+
+&lt;!-- Filtros de texto --&gt;
+&lt;p&gt;Texto original: {{ "hola mundo" }}&lt;/p&gt;
+&lt;p&gt;Mayúsculas: {{ "hola mundo"|upper }}&lt;/p&gt;
+&lt;p&gt;Capitalizado: {{ "hola mundo"|title }}&lt;/p&gt;
+&lt;p&gt;Longitud: {{ "hola mundo"|length }}&lt;/p&gt;
+&lt;p&gt;Reemplazar: {{ "Hola Juan"|replace("Juan", "María") }}&lt;/p&gt;
+
+&lt;!-- Filtros numéricos --&gt;
+&lt;p&gt;Número: {{ 1234.567 }}&lt;/p&gt;
+&lt;p&gt;Redondeado: {{ 1234.567|round(2) }}&lt;/p&gt;
+&lt;p&gt;Con comas: {{ 1234567|number_format }}&lt;/p&gt;
+
+&lt;!-- Filtros de fecha --&gt;
+&lt;p&gt;Fecha: {{ fecha_actual }}&lt;/p&gt;
+&lt;p&gt;Formato corto: {{ fecha_actual|strftime('%d/%m/%Y') }}&lt;/p&gt;
+
+&lt;!-- Filtros de listas --&gt;
+{% set numeros = [1, 2, 3, 4, 5] %}
+&lt;p&gt;Lista: {{ numeros|join(', ') }}&lt;/p&gt;
+&lt;p&gt;Primero: {{ numeros|first }}&lt;/p&gt;
+&lt;p&gt;Último: {{ numeros|last }}&lt;/p&gt;
+&lt;p&gt;Suma: {{ numeros|sum }}&lt;/p&gt;
+&lt;p&gt;Ordenado: {{ [3, 1, 4, 1, 5]|sort|join(', ') }}&lt;/p&gt;
+
+&lt;!-- Funciones personalizadas --&gt;
+{% macro render_usuario(usuario) %}
+    &lt;div class="usuario-card"&gt;
+        &lt;h4&gt;{{ usuario.nombre }}&lt;/h4&gt;
+        &lt;p&gt;{{ usuario.email }}&lt;/p&gt;
+        &lt;small&gt;Registrado: {{ usuario.fecha_registro|strftime('%d/%m/%Y') }}&lt;/small&gt;
+    &lt;/div&gt;
+{% endmacro %}
+
+&lt;h3&gt;Usuarios&lt;/h3&gt;
+{% for usuario in usuarios %}
+    {{ render_usuario(usuario) }}
+{% endfor %}
+
+&lt;!-- Condicionales --&gt;
+{% if usuarios|length > 0 %}
+    &lt;p&gt;Hay {{ usuarios|length }} usuarios registrados.&lt;/p&gt;
+{% else %}
+    &lt;p&gt;No hay usuarios registrados.&lt;/p&gt;
+{% endif %}
+
+&lt;!-- Bucles con control --&gt;
+&lt;h3&gt;Primeros 3 usuarios:&lt;/h3&gt;
+{% for usuario in usuarios[:3] %}
+    &lt;p&gt;{{ loop.index }}. {{ usuario.nombre }}{% if not loop.last %}, {% endif %}&lt;/p&gt;
+{% endfor %}
+
+&lt;!-- Variables y alcance --&gt;
+{% set total_usuarios = usuarios|length %}
+{% set promedio_edad = usuarios|map(attribute='edad')|sum / total_usuarios %}
+
+&lt;div class="estadisticas"&gt;
+    &lt;p&gt;Total de usuarios: {{ total_usuarios }}&lt;/p&gt;
+    &lt;p&gt;Promedio de edad: {{ promedio_edad|round(1) }} años&lt;/p&gt;
+&lt;/div&gt;
+{% endblock %}</code></pre>
+            </div>
+        </section>
+
+        <section id="forms" class="section">
+            <h2>Formularios con Flask-WTF</h2>
+            <h3>Instalación y Configuración</h3>
+            <div class="example">
+                <pre><code>pip install flask-wtf
+
+# app/__init__.py
+from flask import Flask
+from flask_wtf import CSRFProtect
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'tu_clave_secreta_muy_segura'
+app.config['WTF_CSRF_ENABLED'] = True
+
+csrf = CSRFProtect(app)</code></pre>
+            </div>
+
+            <h3>Creando Formularios</h3>
+            <div class="example">
+                <pre><code># app/forms.py
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, EmailField, TextAreaField, \
+                    IntegerField, FloatField, BooleanField, SelectField, \
+                    DateField, FileField, SubmitField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, \
+                              NumberRange, Optional
+
+class LoginForm(FlaskForm):
+    email = EmailField('Email', validators=[
+        DataRequired(message='El email es obligatorio'),
+        Email(message='Formato de email inválido')
+    ])
+    password = PasswordField('Contraseña', validators=[
+        DataRequired(message='La contraseña es obligatoria'),
+        Length(min=6, message='La contraseña debe tener al menos 6 caracteres')
+    ])
+    remember = BooleanField('Recordarme')
+    submit = SubmitField('Iniciar Sesión')
+
+class RegistroForm(FlaskForm):
+    nombre = StringField('Nombre completo', validators=[
+        DataRequired(message='El nombre es obligatorio'),
+        Length(min=2, max=100, message='El nombre debe tener entre 2 y 100 caracteres')
+    ])
+    email = EmailField('Email', validators=[
+        DataRequired(message='El email es obligatorio'),
+        Email(message='Formato de email inválido')
+    ])
+    password = PasswordField('Contraseña', validators=[
+        DataRequired(message='La contraseña es obligatoria'),
+        Length(min=8, message='La contraseña debe tener al menos 8 caracteres')
+    ])
+    confirm_password = PasswordField('Confirmar contraseña', validators=[
+        DataRequired(message='Debe confirmar la contraseña'),
+        EqualTo('password', message='Las contraseñas no coinciden')
+    ])
+    aceptar_terminos = BooleanField('Acepto los términos y condiciones', validators=[
+        DataRequired(message='Debe aceptar los términos')
+    ])
+    submit = SubmitField('Registrarse')
+
+class ProductoForm(FlaskForm):
+    nombre = StringField('Nombre del producto', validators=[
+        DataRequired(),
+        Length(min=3, max=200)
+    ])
+    descripcion = TextAreaField('Descripción', validators=[
+        Optional(),
+        Length(max=1000)
+    ])
+    precio = FloatField('Precio', validators=[
+        DataRequired(),
+        NumberRange(min=0.01, message='El precio debe ser mayor a 0')
+    ])
+    stock = IntegerField('Stock', validators=[
+        DataRequired(),
+        NumberRange(min=0, message='El stock no puede ser negativo')
+    ])
+    categoria = SelectField('Categoría', choices=[
+        ('', 'Seleccionar categoría'),
+        ('electronica', 'Electrónica'),
+        ('ropa', 'Ropa'),
+        ('hogar', 'Hogar'),
+        ('deportes', 'Deportes')
+    ], validators=[DataRequired()])
+    
+    imagen = FileField('Imagen del producto', validators=[
+        Optional()
+    ])
+    
+    disponible = BooleanField('Producto disponible', default=True)
+    submit = SubmitField('Guardar Producto')
+
+class ContactoForm(FlaskForm):
+    nombre = StringField('Nombre', validators=[DataRequired(), Length(min=2, max=100)])
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    asunto = SelectField('Asunto', choices=[
+        ('general', 'Consulta general'),
+        ('soporte', 'Soporte técnico'),
+        ('ventas', 'Ventas'),
+        ('otros', 'Otros')
+    ], validators=[DataRequired()])
+    mensaje = TextAreaField('Mensaje', validators=[
+        DataRequired(),
+        Length(min=10, max=1000, message='El mensaje debe tener entre 10 y 1000 caracteres')
+    ])
+    submit = SubmitField('Enviar Mensaje')</code></pre>
+            </div>
+
+            <h3>Usando Formularios en Vistas</h3>
+            <div class="example">
+                <pre><code># app/routes.py
+from flask import render_template, redirect, url_for, flash, request
+from .forms import LoginForm, RegistroForm, ProductoForm, ContactoForm
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        # Lógica de autenticación
+        email = form.email.data
+        password = form.password.data
+        remember = form.remember.data
+        
+        # Verificar credenciales (ejemplo simplificado)
+        if email == 'admin@example.com' and password == 'password':
+            flash('Login exitoso', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Credenciales inválidas', 'error')
+    
+    return render_template('auth/login.html', form=form)
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    form = RegistroForm()
+    
+    if form.validate_on_submit():
+        # Lógica de registro
+        nombre = form.nombre.data
+        email = form.email.data
+        password = form.password.data
+        
+        # Crear usuario en base de datos
+        # ...
+        
+        flash('Usuario registrado exitosamente', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('auth/registro.html', form=form)
+
+@app.route('/producto/nuevo', methods=['GET', 'POST'])
+def nuevo_producto():
+    form = ProductoForm()
+    
+    if form.validate_on_submit():
+        # Procesar datos del formulario
+        producto_data = {
+            'nombre': form.nombre.data,
+            'descripcion': form.descripcion.data,
+            'precio': form.precio.data,
+            'stock': form.stock.data,
+            'categoria': form.categoria.data,
+            'disponible': form.disponible.data
+        }
+        
+        # Guardar en base de datos
+        # ...
+        
+        flash('Producto creado exitosamente', 'success')
+        return redirect(url_for('productos'))
+    
+    return render_template('productos/nuevo.html', form=form)
+
+@app.route('/contacto', methods=['GET', 'POST'])
+def contacto():
+    form = ContactoForm()
+    
+    if form.validate_on_submit():
+        # Procesar formulario de contacto
+        contacto_data = {
+            'nombre': form.nombre.data,
+            'email': form.email.data,
+            'asunto': form.asunto.data,
+            'mensaje': form.mensaje.data
+        }
+        
+        # Enviar email o guardar en BD
+        # ...
+        
+        flash('Mensaje enviado exitosamente', 'success')
+        return redirect(url_for('index'))
+    
+    return render_template('contacto.html', form=form)</code></pre>
+            </div>
+
+            <h3>Templates para Formularios</h3>
+            <div class="example">
+                <pre><code>&lt;!-- templates/auth/login.html --&gt;
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión{% endblock %}
+
+{% block content %}
+&lt;div class="row justify-content-center"&gt;
+    &lt;div class="col-md-6"&gt;
+        &lt;div class="card"&gt;
+            &lt;div class="card-header"&gt;
+                &lt;h3&gt;Iniciar Sesión&lt;/h3&gt;
+            &lt;/div&gt;
+            &lt;div class="card-body"&gt;
+                &lt;form method="POST"&gt;
+                    {{ form.hidden_tag() }}
+                    
+                    &lt;div class="mb-3"&gt;
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control") }}
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                                &lt;div class="text-danger"&gt;{{ error }}&lt;/div&gt;
+                            {% endfor %}
+                        {% endif %}
+                    &lt;/div&gt;
+                    
+                    &lt;div class="mb-3"&gt;
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control") }}
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                                &lt;div class="text-danger"&gt;{{ error }}&lt;/div&gt;
+                            {% endfor %}
+                        {% endif %}
+                    &lt;/div&gt;
+                    
+                    &lt;div class="mb-3 form-check"&gt;
+                        {{ form.remember(class="form-check-input") }}
+                        {{ form.remember.label(class="form-check-label") }}
+                    &lt;/div&gt;
+                    
+                    &lt;div class="d-grid"&gt;
+                        {{ form.submit(class="btn btn-primary") }}
+                    &lt;/div&gt;
+                &lt;/form&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+{% endblock %}
+
+&lt;!-- templates/productos/nuevo.html --&gt;
+{% extends 'base.html' %}
+
+{% block title %}Nuevo Producto{% endblock %}
+
+{% block content %}
+&lt;div class="row justify-content-center"&gt;
+    &lt;div class="col-md-8"&gt;
+        &lt;div class="card"&gt;
+            &lt;div class="card-header"&gt;
+                &lt;h3&gt;Crear Nuevo Producto&lt;/h3&gt;
+            &lt;/div&gt;
+            &lt;div class="card-body"&gt;
+                &lt;form method="POST" enctype="multipart/form-data"&gt;
+                    {{ form.hidden_tag() }}
+                    
+                    &lt;div class="row"&gt;
+                        &lt;div class="col-md-6"&gt;
+                            &lt;div class="mb-3"&gt;
+                                {{ form.nombre.label(class="form-label") }}
+                                {{ form.nombre(class="form-control") }}
+                                {% if form.nombre.errors %}
+                                    {% for error in form.nombre.errors %}
+                                        &lt;div class="text-danger"&gt;{{ error }}&lt;/div&gt;
+                                    {% endfor %}
+                                {% endif %}
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div class="col-md-6"&gt;
+                            &lt;div class="mb-3"&gt;
+                                {{ form.precio.label(class="form-label") }}
+                                {{ form.precio(class="form-control", step="0.01") }}
+                                {% if form.precio.errors %}
+                                    {% for error in form.precio.errors %}
+                                        &lt;div class="text-danger"&gt;{{ error }}&lt;/div&gt;
+                                    {% endfor %}
+                                {% endif %}
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class="mb-3"&gt;
+                        {{ form.descripcion.label(class="form-label") }}
+                        {{ form.descripcion(class="form-control", rows="3") }}
+                        {% if form.descripcion.errors %}
+                            {% for error in form.descripcion.errors %}
+                                &lt;div class="text-danger"&gt;{{ error }}&lt;/div&gt;
+                            {% endfor %}
+                        {% endif %}
+                    &lt;/div&gt;
+                    
+                    &lt;div class="row"&gt;
+                        &lt;div class="col-md-4"&gt;
+                            &lt;div class="mb-3"&gt;
+                                {{ form.stock.label(class="form-label") }}
+                                {{ form.stock(class="form-control") }}
+                                {% if form.stock.errors %}
+                                    {% for error in form.stock.errors %}
+                                        &lt;div class="text-danger"&gt;{{ error }}&lt;/div&gt;
+                                    {% endfor %}
+                                {% endif %}
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div class="col-md-4"&gt;
+                            &lt;div class="mb-3"&gt;
+                                {{ form.categoria.label(class="form-label") }}
+                                {{ form.categoria(class="form-select") }}
+                                {% if form.categoria.errors %}
+                                    {% for error in form.categoria.errors %}
+                                        &lt;div class="text-danger"&gt;{{ error }}&lt;/div&gt;
+                                    {% endfor %}
+                                {% endif %}
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                        
+                        &lt;div class="col-md-4"&gt;
+                            &lt;div class="mb-3"&gt;
+                                {{ form.imagen.label(class="form-label") }}
+                                {{ form.imagen(class="form-control") }}
+                                {% if form.imagen.errors %}
+                                    {% for error in form.imagen.errors %}
+                                        &lt;div class="text-danger"&gt;{{ error }}&lt;/div&gt;
+                                    {% endfor %}
+                                {% endif %}
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    
+                    &lt;div class="mb-3 form-check"&gt;
+                        {{ form.disponible(class="form-check-input") }}
+                        {{ form.disponible.label(class="form-check-label") }}
+                    &lt;/div&gt;
+                    
+                    &lt;div class="d-grid"&gt;
+                        {{ form.submit(class="btn btn-success") }}
+                    &lt;/div&gt;
+                &lt;/form&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+{% endblock %}</code></pre>
+            </div>
+        </section>
+
+        <section id="database" class="section">
+            <h2>Base de Datos con SQLAlchemy</h2>
+            <h3>Configuración</h3>
+            <div class="example">
+                <pre><code>pip install flask-sqlalchemy
+
+# app/__init__.py
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'tu_clave_secreta'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)</code></pre>
+            </div>
+
+            <h3>Modelos</h3>
+            <div class="example">
+                <pre><code># app/models.py
+from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from . import db
+
+class Usuario(db.Model):
+    __tablename__ = 'usuarios'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
+    activo = db.Column(db.Boolean, default=True)
+    
+    # Relaciones
+    posts = db.relationship('Post', backref='autor', lazy=True)
+    
+    @property
+    def password(self):
+        raise AttributeError('password no es un atributo legible')
+    
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def __repr__(self):
+        return f'&lt;Usuario {self.nombre}&gt;'
+
+class Categoria(db.Model):
+    __tablename__ = 'categorias'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50), unique=True, nullable=False)
+    descripcion = db.Column(db.Text)
+    slug = db.Column(db.String(50), unique=True)
+    
+    # Relaciones
+    productos = db.relationship('Producto', backref='categoria_rel', lazy=True)
+    
+    def __repr__(self):
+        return f'&lt;Categoria {self.nombre}&gt;'
+
+class Producto(db.Model):
+    __tablename__ = 'productos'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(200), nullable=False)
+    descripcion = db.Column(db.Text)
+    precio = db.Column(db.Float, nullable=False)
+    stock = db.Column(db.Integer, default=0)
+    disponible = db.Column(db.Boolean, default=True)
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Foreign Keys
+    categoria_id = db.Column(db.Integer, db.ForeignKey('categorias.id'), nullable=False)
+    
+    # Propiedades calculadas
+    @property
+    def precio_formateado(self):
+        return f"${self.precio:,.2f}"
+    
+    @property
+    def stock_status(self):
+        if self.stock == 0:
+            return "Agotado"
+        elif self.stock < 10:
+            return "Bajo stock"
+        else:
+            return "Disponible"
+    
+    def __repr__(self):
+        return f'&lt;Producto {self.nombre}&gt;'
+
+class Post(db.Model):
+    __tablename__ = 'posts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(200), nullable=False)
+    contenido = db.Column(db.Text, nullable=False)
+    fecha_publicacion = db.Column(db.DateTime, default=datetime.utcnow)
+    publicado = db.Column(db.Boolean, default=True)
+    
+    # Foreign Keys
+    autor_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    
+    # Relaciones
+    comentarios = db.relationship('Comentario', backref='post_rel', lazy=True)
+    
+    def __repr__(self):
+        return f'&lt;Post {self.titulo}&gt;'
+
+class Comentario(db.Model):
+    __tablename__ = 'comentarios'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    contenido = db.Column(db.Text, nullable=False)
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Foreign Keys
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
+    autor_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    
+    def __repr__(self):
+        return f'&lt;Comentario {self.id}&gt;'</code></pre>
+            </div>
+
+            <h3>Operaciones CRUD</h3>
+            <div class="example">
+                <pre><code># app/routes.py
+from flask import request, redirect, url_for, flash
+from . import app, db
+from .models import Usuario, Producto, Categoria, Post, Comentario
+
+@app.route('/usuarios')
+def listar_usuarios():
+    usuarios = Usuario.query.all()
+    return render_template('usuarios/index.html', usuarios=usuarios)
+
+@app.route('/usuario/<int:id>')
+def ver_usuario(id):
+    usuario = Usuario.query.get_or_404(id)
+    return render_template('usuarios/show.html', usuario=usuario)
+
+@app.route('/productos')
+def listar_productos():
+    pagina = request.args.get('pagina', 1, type=int)
+    busqueda = request.args.get('q', '')
+    categoria_id = request.args.get('categoria', type=int)
+    
+    query = Producto.query.filter_by(disponible=True)
+    
+    if busqueda:
+        query = query.filter(Producto.nombre.contains(busqueda))
+    
+    if categoria_id:
+        query = query.filter_by(categoria_id=categoria_id)
+    
+    productos = query.paginate(page=pagina, per_page=12, error_out=False)
+    categorias = Categoria.query.all()
+    
+    return render_template('productos/index.html', 
+                         productos=productos, 
+                         categorias=categorias,
+                         busqueda=busqueda)
+
+@app.route('/producto/<int:id>')
+def ver_producto(id):
+    producto = Producto.query.get_or_404(id)
+    return render_template('productos/show.html', producto=producto)
+
+@app.route('/crear-producto', methods=['GET', 'POST'])
+def crear_producto():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre')
+        descripcion = request.form.get('descripcion')
+        precio = float(request.form.get('precio'))
+        stock = int(request.form.get('stock'))
+        categoria_id = int(request.form.get('categoria_id'))
+        
+        producto = Producto(
+            nombre=nombre,
+            descripcion=descripcion,
+            precio=precio,
+            stock=stock,
+            categoria_id=categoria_id
+        )
+        
+        try:
+            db.session.add(producto)
+            db.session.commit()
+            flash('Producto creado exitosamente', 'success')
+            return redirect(url_for('listar_productos'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error al crear el producto', 'error')
+    
+    categorias = Categoria.query.all()
+    return render_template('productos/crear.html', categorias=categorias)
+
+@app.route('/editar-producto/<int:id>', methods=['GET', 'POST'])
+def editar_producto(id):
+    producto = Producto.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        producto.nombre = request.form.get('nombre')
+        producto.descripcion = request.form.get('descripcion')
+        producto.precio = float(request.form.get('precio'))
+        producto.stock = int(request.form.get('stock'))
+        producto.categoria_id = int(request.form.get('categoria_id'))
+        
+        try:
+            db.session.commit()
+            flash('Producto actualizado exitosamente', 'success')
+            return redirect(url_for('ver_producto', id=producto.id))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error al actualizar el producto', 'error')
+    
+    categorias = Categoria.query.all()
+    return render_template('productos/editar.html', 
+                         producto=producto, 
+                         categorias=categorias)
+
+@app.route('/eliminar-producto/<int:id>', methods=['POST'])
+def eliminar_producto(id):
+    producto = Producto.query.get_or_404(id)
+    
+    try:
+        db.session.delete(producto)
+        db.session.commit()
+        flash('Producto eliminado exitosamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error al eliminar el producto', 'error')
+    
+    return redirect(url_for('listar_productos'))
+
+# Consultas avanzadas
+@app.route('/productos/categoria/<int:categoria_id>')
+def productos_por_categoria(categoria_id):
+    categoria = Categoria.query.get_or_404(categoria_id)
+    productos = Producto.query.filter_by(categoria_id=categoria_id, disponible=True).all()
+    return render_template('productos/categoria.html', categoria=categoria, productos=productos)
+
+@app.route('/productos/precio/<float:min_precio>/<float:max_precio>')
+def productos_por_rango_precio(min_precio, max_precio):
+    productos = Producto.query.filter(
+        Producto.precio.between(min_precio, max_precio),
+        Producto.disponible == True
+    ).all()
+    
+    return render_template('productos/rango_precio.html', 
+                         productos=productos, 
+                         min_precio=min_precio, 
+                         max_precio=max_precio)
+
+@app.route('/estadisticas')
+def estadisticas():
+    # Estadísticas usando funciones de agregación
+    from sqlalchemy import func
+    
+    stats = db.session.query(
+        func.count(Producto.id).label('total_productos'),
+        func.avg(Producto.precio).label('precio_promedio'),
+        func.sum(Producto.stock).label('stock_total'),
+        func.min(Producto.precio).label('precio_minimo'),
+        func.max(Producto.precio).label('precio_maximo')
+    ).first()
+    
+    # Productos por categoría
+    productos_por_categoria = db.session.query(
+        Categoria.nombre,
+        func.count(Producto.id).label('cantidad')
+    ).join(Producto).group_by(Categoria.id).all()
+    
+    return render_template('estadisticas.html', 
+                         stats=stats, 
+                         productos_por_categoria=productos_por_categoria)</code></pre>
+            </div>
+        </section>
+
+        <section id="auth" class="section">
+            <h2>Autenticación con Flask-Login</h2>
+            <h3>Instalación y Configuración</h3>
+            <div class="example">
+                <pre><code>pip install flask-login
+
+# app/__init__.py
+from flask import Flask
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'tu_clave_secreta'
+
+# Configurar Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login'
+login_manager.login_message = 'Debes iniciar sesión para acceder a esta página'
+
+db = SQLAlchemy(app)
+
+# Importar modelos después de crear db
+from . import models
+
+@login_manager.user_loader
+def load_user(user_id):
+    return models.Usuario.query.get(int(user_id))</code></pre>
+            </div>
+
+            <h3>Modelo de Usuario con Flask-Login</h3>
+            <div class="example">
+                <pre><code># app/models.py
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
+from . import db
+
+class Usuario(UserMixin, db.Model):
+    __tablename__ = 'usuarios'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
+    activo = db.Column(db.Boolean, default=True)
+    rol = db.Column(db.String(20), default='usuario')
+    
+    # Relaciones
+    posts = db.relationship('Post', backref='autor', lazy=True)
+    
+    @property
+    def password(self):
+        raise AttributeError('password no es un atributo legible')
+    
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def is_admin(self):
+        return self.rol == 'admin'
+    
+    def __repr__(self):
+        return f'&lt;Usuario {self.nombre}&gt;'</code></pre>
+            </div>
+
+            <h3>Vistas de Autenticación</h3>
+            <div class="example">
+                <pre><code># app/auth/routes.py
+from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask_login import login_user, logout_user, login_required, current_user
+from werkzeug.urls import url_parse
+from .. import db
+from ..models import Usuario
+from ..forms import LoginForm, RegistroForm
+
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        usuario = Usuario.query.filter_by(email=form.email.data).first()
+        
+        if usuario and usuario.verify_password(form.password.data):
+            login_user(usuario, remember=form.remember.data)
+            next_page = request.args.get('next')
+            
+            if not next_page or url_parse(next_page).netloc != '':
+                next_page = url_for('main.index')
+            
+            flash('Login exitoso', 'success')
+            return redirect(next_page)
+        else:
+            flash('Email o contraseña inválidos', 'error')
+    
+    return render_template('auth/login.html', form=form)
+
+@auth_bp.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    
+    form = RegistroForm()
+    
+    if form.validate_on_submit():
+        usuario = Usuario(
+            nombre=form.nombre.data,
+            email=form.email.data,
+            password=form.password.data
+        )
+        
+        try:
+            db.session.add(usuario)
+            db.session.commit()
+            
+            flash('Usuario registrado exitosamente', 'success')
+            return redirect(url_for('auth.login'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error al registrar usuario', 'error')
+    
+    return render_template('auth/registro.html', form=form)
+
+@auth_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Sesión cerrada exitosamente', 'info')
+    return redirect(url_for('main.index'))
+
+# app/main/routes.py
+from flask import Blueprint, render_template
+from flask_login import login_required
+
+main_bp = Blueprint('main', __name__)
+
+@main_bp.route('/')
+def index():
+    return render_template('main/index.html')
+
+@main_bp.route('/perfil')
+@login_required
+def perfil():
+    return render_template('main/perfil.html')
+
+@main_bp.route('/admin')
+@login_required
+def admin():
+    if not current_user.is_admin():
+        flash('Acceso denegado', 'error')
+        return redirect(url_for('main.index'))
+    
+    return render_template('admin/dashboard.html')</code></pre>
+            </div>
+        </section>
+
+        <section id="api" class="section">
+            <h2>APIs REST con Flask</h2>
+            <h3>API Básica</h3>
+            <div class="example">
+                <pre><code># app/api/routes.py
+from flask import Blueprint, jsonify, request
+from ..models import Producto, Categoria
+from .. import db
+
+api_bp = Blueprint('api', __name__, url_prefix='/api')
+
+@api_bp.route('/productos')
+def get_productos():
+    productos = Producto.query.filter_by(disponible=True).all()
+    
+    resultado = []
+    for producto in productos:
+        resultado.append({
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'descripcion': producto.descripcion,
+            'precio': producto.precio,
+            'stock': producto.stock,
+            'categoria': producto.categoria_rel.nombre if producto.categoria_rel else None
+        })
+    
+    return jsonify({
+        'success': True,
+        'data': resultado,
+        'count': len(resultado)
+    })
+
+@api_bp.route('/productos/<int:id>')
+def get_producto(id):
+    producto = Producto.query.get_or_404(id)
+    
+    return jsonify({
+        'success': True,
+        'data': {
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'descripcion': producto.descripcion,
+            'precio': producto.precio,
+            'stock': producto.stock,
+            'disponible': producto.disponible,
+            'categoria': producto.categoria_rel.nombre if producto.categoria_rel else None,
+            'fecha_creacion': producto.fecha_creacion.isoformat()
+        }
+    })
+
+@api_bp.route('/productos', methods=['POST'])
+def crear_producto():
+    data = request.get_json()
+    
+    # Validación básica
+    if not data or not data.get('nombre') or not data.get('precio'):
+        return jsonify({
+            'success': False,
+            'error': 'Nombre y precio son requeridos'
+        }), 400
+    
+    producto = Producto(
+        nombre=data['nombre'],
+        descripcion=data.get('descripcion', ''),
+        precio=data['precio'],
+        stock=data.get('stock', 0),
+        categoria_id=data.get('categoria_id')
+    )
+    
+    try:
+        db.session.add(producto)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'id': producto.id,
+                'nombre': producto.nombre,
+                'precio': producto.precio
+            },
+            'message': 'Producto creado exitosamente'
+        }), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'Error al crear el producto'
+        }), 500
+
+@api_bp.route('/productos/<int:id>', methods=['PUT'])
+def actualizar_producto(id):
+    producto = Producto.query.get_or_404(id)
+    data = request.get_json()
+    
+    if not data:
+        return jsonify({
+            'success': False,
+            'error': 'Datos requeridos'
+        }), 400
+    
+    # Actualizar campos proporcionados
+    if 'nombre' in data:
+        producto.nombre = data['nombre']
+    if 'descripcion' in data:
+        producto.descripcion = data['descripcion']
+    if 'precio' in data:
+        producto.precio = data['precio']
+    if 'stock' in data:
+        producto.stock = data['stock']
+    if 'categoria_id' in data:
+        producto.categoria_id = data['categoria_id']
+    
+    try:
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'id': producto.id,
+                'nombre': producto.nombre,
+                'precio': producto.precio
+            },
+            'message': 'Producto actualizado exitosamente'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'Error al actualizar el producto'
+        }), 500
+
+@api_bp.route('/productos/<int:id>', methods=['DELETE'])
+def eliminar_producto(id):
+    producto = Producto.query.get_or_404(id)
+    
+    try:
+        db.session.delete(producto)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Producto eliminado exitosamente'
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'Error al eliminar el producto'
+        }), 500
+
+# API de categorías
+@api_bp.route('/categorias')
+def get_categorias():
+    categorias = Categoria.query.all()
+    
+    resultado = []
+    for categoria in categorias:
+        resultado.append({
+            'id': categoria.id,
+            'nombre': categoria.nombre,
+            'descripcion': categoria.descripcion,
+            'productos_count': len(categoria.productos)
+        })
+    
+    return jsonify({
+        'success': True,
+        'data': resultado
+    })
+
+# Búsqueda
+@api_bp.route('/productos/buscar')
+def buscar_productos():
+    query = request.args.get('q', '')
+    categoria_id = request.args.get('categoria_id', type=int)
+    precio_min = request.args.get('precio_min', type=float)
+    precio_max = request.args.get('precio_max', type=float)
+    
+    productos_query = Producto.query.filter_by(disponible=True)
+    
+    if query:
+        productos_query = productos_query.filter(
+            Producto.nombre.contains(query) | 
+            Producto.descripcion.contains(query)
+        )
+    
+    if categoria_id:
+        productos_query = productos_query.filter_by(categoria_id=categoria_id)
+    
+    if precio_min is not None:
+        productos_query = productos_query.filter(Producto.precio >= precio_min)
+    
+    if precio_max is not None:
+        productos_query = productos_query.filter(Producto.precio <= precio_max)
+    
+    productos = productos_query.all()
+    
+    resultado = []
+    for producto in productos:
+        resultado.append({
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'precio': producto.precio,
+            'categoria': producto.categoria_rel.nombre if producto.categoria_rel else None
+        })
+    
+    return jsonify({
+        'success': True,
+        'data': resultado,
+        'count': len(resultado),
+        'query': query
+    })</code></pre>
+            </div>
+
+            <h3>Documentación con Flask-RESTX</h3>
+            <div class="example">
+                <pre><code>pip install flask-restx
+
+# app/api/__init__.py
+from flask import Blueprint
+from flask_restx import Api
+
+api_bp = Blueprint('api', __name__, url_prefix='/api')
+api = Api(api_bp, 
+          title='Mi API REST',
+          version='1.0',
+          description='API para gestión de productos')
+
+# Importar namespaces
+from .productos import api as productos_ns
+from .categorias import api as categorias_ns
+
+api.add_namespace(productos_ns)
+api.add_namespace(categorias_ns)
+
+# app/api/productos.py
+from flask_restx import Namespace, Resource, fields
+from ..models import Producto
+
+api = Namespace('productos', description='Operaciones con productos')
+
+# Modelos de documentación
+producto_model = api.model('Producto', {
+    'id': fields.Integer(readonly=True, description='ID único del producto'),
+    'nombre': fields.String(required=True, description='Nombre del producto'),
+    'descripcion': fields.String(description='Descripción del producto'),
+    'precio': fields.Float(required=True, description='Precio del producto'),
+    'stock': fields.Integer(description='Cantidad en stock'),
+    'disponible': fields.Boolean(description='Si el producto está disponible'),
+    'categoria': fields.String(description='Nombre de la categoría')
+})
+
+@api.route('/')
+class ProductosList(Resource):
+    @api.doc('listar_productos')
+    @api.marshal_list_with(producto_model)
+    def get(self):
+        """Listar todos los productos"""
+        productos = Producto.query.filter_by(disponible=True).all()
+        return [{
+            'id': p.id,
+            'nombre': p.nombre,
+            'descripcion': p.descripcion,
+            'precio': p.precio,
+            'stock': p.stock,
+            'disponible': p.disponible,
+            'categoria': p.categoria_rel.nombre if p.categoria_rel else None
+        } for p in productos]
+
+    @api.doc('crear_producto')
+    @api.expect(producto_model)
+    @api.marshal_with(producto_model, code=201)
+    def post(self):
+        """Crear un nuevo producto"""
+        data = api.payload
+        
+        producto = Producto(
+            nombre=data['nombre'],
+            descripcion=data.get('descripcion', ''),
+            precio=data['precio'],
+            stock=data.get('stock', 0)
+        )
+        
+        db.session.add(producto)
+        db.session.commit()
+        
+        return {
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'descripcion': producto.descripcion,
+            'precio': producto.precio,
+            'stock': producto.stock,
+            'disponible': producto.disponible
+        }, 201
+
+@api.route('/<int:id>')
+@api.param('id', 'ID del producto')
+class ProductoItem(Resource):
+    @api.doc('obtener_producto')
+    @api.marshal_with(producto_model)
+    def get(self, id):
+        """Obtener un producto por ID"""
+        producto = Producto.query.get_or_404(id)
+        return {
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'descripcion': producto.descripcion,
+            'precio': producto.precio,
+            'stock': producto.stock,
+            'disponible': producto.disponible,
+            'categoria': producto.categoria_rel.nombre if producto.categoria_rel else None
+        }
+
+    @api.doc('actualizar_producto')
+    @api.expect(producto_model)
+    @api.marshal_with(producto_model)
+    def put(self, id):
+        """Actualizar un producto"""
+        producto = Producto.query.get_or_404(id)
+        data = api.payload
+        
+        producto.nombre = data.get('nombre', producto.nombre)
+        producto.descripcion = data.get('descripcion', producto.descripcion)
+        producto.precio = data.get('precio', producto.precio)
+        producto.stock = data.get('stock', producto.stock)
+        
+        db.session.commit()
+        
+        return {
+            'id': producto.id,
+            'nombre': producto.nombre,
+            'descripcion': producto.descripcion,
+            'precio': producto.precio,
+            'stock': producto.stock,
+            'disponible': producto.disponible
+        }
+
+    @api.doc('eliminar_producto')
+    @api.response(204, 'Producto eliminado')
+    def delete(self, id):
+        """Eliminar un producto"""
+        producto = Producto.query.get_or_404(id)
+        db.session.delete(producto)
+        db.session.commit()
+        return '', 204</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Prácticos con Flask</h2>
+            <h3>Blog Personal</h3>
+            <p>Sistema de blog completo con artículos, categorías, comentarios y panel de administración.</p>
+
+            <h3>API REST</h3>
+            <p>API RESTful completa con autenticación JWT, documentación automática y tests.</p>
+
+            <h3>Dashboard Administrativo</h3>
+            <p>Panel de administración con gráficos, reportes y gestión de datos en tiempo real.</p>
+
+            <h3>Sistema de Reservas</h3>
+            <p>Aplicación para reservas de recursos (hoteles, restaurantes, eventos) con calendario.</p>
+
+            <h3>Tienda Online</h3>
+            <p>E-commerce completo con carrito de compras, pagos y gestión de inventario.</p>
+        </section>
+    </div>
+</body>
+</html>

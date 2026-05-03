@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express.js - Framework para Node.js</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: #000000; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #000000; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#instalacion">Instalación</a>
+            <a href="#routing">Routing</a>
+            <a href="#middleware">Middleware</a>
+            <a href="#templates">Templates</a>
+            <a href="#api">APIs REST</a>
+            <a href="#seguridad">Seguridad</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>⚫ Express.js - Framework Web para Node.js</h1>
+
+        <section id="intro" class="section">
+            <h2>Introducción a Express.js</h2>
+            <p>Express.js es un framework web minimalista y flexible para Node.js que proporciona un conjunto robusto de características para aplicaciones web y móviles.</p>
+            <h3>¿Por qué Express.js?</h3>
+            <ul>
+                <li><strong>Minimalista:</strong> Solo lo esencial, extensible con middleware</li>
+                <li><strong>Flexible:</strong> No impone estructura, libertad total</li>
+                <li><strong>Middleware:</strong> Sistema poderoso para extender funcionalidades</li>
+                <li><strong>Routing:</strong> Sistema de rutas robusto y flexible</li>
+                <li><strong>Comunidad:</strong> Miles de middleware disponibles</li>
+                <li><strong>Performance:</strong> Alto rendimiento y escalable</li>
+            </ul>
+        </section>
+
+        <section id="instalacion" class="section">
+            <h2>Instalación y Configuración</h2>
+            <div class="example">
+                <pre><code>// Crear proyecto
+mkdir mi-api-express
+cd mi-api-express
+npm init -y
+
+// Instalar Express
+npm install express
+
+// Instalar dependencias comunes
+npm install nodemon dotenv cors helmet morgan
+
+// package.json scripts
+{
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  }
+}</code></pre>
+            </div>
+
+            <h3>Servidor Básico</h3>
+            <div class="example">
+                <pre><code>// server.js
+const express = require('express');
+const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Servidor Express corriendo en puerto ${PORT}`);
+});</code></pre>
+            </div>
+        </section>
+
+        <section id="routing" class="section">
+            <h2>Sistema de Routing</h2>
+            <h3>Rutas Básicas</h3>
+            <div class="example">
+                <pre><code>const express = require('express');
+const app = express();
+
+// Rutas GET
+app.get('/', (req, res) => {
+    res.send('¡Hola desde Express!');
+});
+
+app.get('/about', (req, res) => {
+    res.send('<h1>Acerca de nosotros</h1>');
+});
+
+// Parámetros de ruta
+app.get('/usuario/:id', (req, res) => {
+    const userId = req.params.id;
+    res.send(`Perfil del usuario ${userId}`);
+});
+
+// Múltiples parámetros
+app.get('/categoria/:categoria/producto/:id', (req, res) => {
+    const { categoria, id } = req.params;
+    res.send(`Producto ${id} en categoría ${categoria}`);
+});
+
+// Query parameters
+app.get('/buscar', (req, res) => {
+    const { q, limit = 10 } = req.query;
+    res.send(`Buscando "${q}" con límite ${limit}`);
+});
+
+// Rutas POST
+app.post('/usuarios', (req, res) => {
+    // Crear nuevo usuario
+    res.status(201).send('Usuario creado');
+});
+
+// PUT y DELETE
+app.put('/usuarios/:id', (req, res) => {
+    const userId = req.params.id;
+    res.send(`Usuario ${userId} actualizado`);
+});
+
+app.delete('/usuarios/:id', (req, res) => {
+    const userId = req.params.id;
+    res.send(`Usuario ${userId} eliminado`);
+});</code></pre>
+            </div>
+
+            <h3>Router Modular</h3>
+            <div class="example">
+                <pre><code>// routes/usuarios.js
+const express = require('express');
+const router = express.Router();
+
+// Middleware específico para estas rutas
+router.use((req, res, next) => {
+    console.log('Accediendo a rutas de usuarios');
+    next();
+});
+
+// GET /usuarios
+router.get('/', (req, res) => {
+    res.json([
+        { id: 1, nombre: 'Juan' },
+        { id: 2, nombre: 'María' }
+    ]);
+});
+
+// GET /usuarios/:id
+router.get('/:id', (req, res) => {
+    const userId = req.params.id;
+    res.json({ id: userId, nombre: `Usuario ${userId}` });
+});
+
+// POST /usuarios
+router.post('/', (req, res) => {
+    // Lógica para crear usuario
+    res.status(201).json({ mensaje: 'Usuario creado' });
+});
+
+module.exports = router;
+
+// server.js
+const express = require('express');
+const usuariosRouter = require('./routes/usuarios');
+
+const app = express();
+app.use(express.json());
+
+// Usar el router
+app.use('/usuarios', usuariosRouter);
+
+// Otras rutas...
+app.use('/productos', require('./routes/productos'));
+app.use('/pedidos', require('./routes/pedidos'));</code></pre>
+            </div>
+        </section>
+
+        <section id="middleware" class="section">
+            <h2>Middleware</h2>
+            <h3>Middleware Built-in</h3>
+            <div class="example">
+                <pre><code>const express = require('express');
+const app = express();
+
+// Middleware para parsear JSON
+app.use(express.json()); // Para application/json
+app.use(express.urlencoded({ extended: true })); // Para application/x-www-form-urlencoded
+
+// Middleware para servir archivos estáticos
+app.use(express.static('public')); // Archivos en /public serán accesibles desde /
+
+app.use('/assets', express.static('public/assets')); // Con prefijo personalizado
+
+// Middleware personalizado
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+    next(); // Importante: llamar next() para continuar
+});
+
+// Middleware de autenticación
+const authenticate = (req, res, next) => {
+    const token = req.header('Authorization');
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Token requerido' });
+    }
+    
+    // Verificar token...
+    next();
+};
+
+// Aplicar middleware a rutas específicas
+app.get('/perfil', authenticate, (req, res) => {
+    res.json({ mensaje: 'Perfil de usuario' });
+});
+
+// Middleware de manejo de errores
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Algo salió mal' });
+});
+
+// Middleware 404
+app.use((req, res) => {
+    res.status(404).json({ error: 'Ruta no encontrada' });
+});</code></pre>
+            </div>
+
+            <h3>Middleware de Terceros</h3>
+            <div class="example">
+                <pre><code>const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+
+const app = express();
+
+// CORS - Cross Origin Resource Sharing
+app.use(cors()); // Permitir todas las solicitudes CORS
+
+// CORS personalizado
+app.use(cors({
+    origin: ['http://localhost:3000', 'https://miapp.com'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Helmet - Seguridad
+app.use(helmet()); // Configura headers de seguridad automáticamente
+
+// Morgan - Logging
+app.use(morgan('combined')); // Logs detallados
+// app.use(morgan('tiny')); // Logs simples
+
+// Rate limiting personalizado
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 100, // límite de 100 requests por windowMs
+    message: 'Demasiadas solicitudes desde esta IP'
+});
+
+app.use('/api/', limiter); // Aplicar solo a rutas de API
+
+// Compresión
+const compression = require('compression');
+app.use(compression()); // Comprimir respuestas</code></pre>
+            </div>
+        </section>
+
+        <section id="templates" class="section">
+            <h2>Plantillas (Templates)</h2>
+            <h3>EJS (Embedded JavaScript)</h3>
+            <div class="example">
+                <pre><code>// Instalar EJS
+npm install ejs
+
+// Configurar EJS
+const express = require('express');
+const app = express();
+
+app.set('view engine', 'ejs');
+app.set('views', './views');
+
+// Ruta con template
+app.get('/', (req, res) => {
+    const datos = {
+        titulo: 'Mi App',
+        usuarios: [
+            { nombre: 'Juan', edad: 25 },
+            { nombre: 'María', edad: 30 }
+        ]
+    };
+    
+    res.render('index', datos);
+});
+
+// views/index.ejs
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;&lt;%= titulo %&gt;&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;&lt;%= titulo %&gt;&lt;/h1&gt;
+    &lt;ul&gt;
+        &lt;% usuarios.forEach(usuario => { %&gt;
+            &lt;li&gt;&lt;%= usuario.nombre %&gt; - &lt;%= usuario.edad %&gt; años&lt;/li&gt;
+        &lt;% }); %&gt;
+    &lt;/ul&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+
+            <h3>Pug (anteriormente Jade)</h3>
+            <div class="example">
+                <pre><code>// Instalar Pug
+npm install pug
+
+// Configurar Pug
+app.set('view engine', 'pug');
+
+// views/layout.pug
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/styles.css')
+  body
+    header
+      h1 Mi Aplicación
+    block content
+    footer
+      p © 2024
+
+// views/index.pug
+extends layout
+
+block content
+  h2 Usuarios
+  each usuario in usuarios
+    .usuario
+      h3= usuario.nombre
+      p= usuario.email</code></pre>
+            </div>
+        </section>
+
+        <section id="api" class="section">
+            <h2>APIs REST con Express</h2>
+            <h3>Estructura de API Profesional</h3>
+            <div class="example">
+                <pre><code>// controllers/UsuarioController.js
+class UsuarioController {
+    constructor() {
+        this.usuarios = []; // Simulación BD
+    }
+
+    getAll = (req, res) => {
+        try {
+            res.json({
+                success: true,
+                data: this.usuarios,
+                count: this.usuarios.length
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: 'Error interno del servidor'
+            });
+        }
+    }
+
+    getById = (req, res) => {
+        try {
+            const { id } = req.params;
+            const usuario = this.usuarios.find(u => u.id == id);
+            
+            if (!usuario) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Usuario no encontrado'
+                });
+            }
+            
+            res.json({
+                success: true,
+                data: usuario
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: 'Error interno del servidor'
+            });
+        }
+    }
+
+    create = (req, res) => {
+        try {
+            const { nombre, email, password } = req.body;
+            
+            // Validación
+            if (!nombre || !email || !password) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Todos los campos son requeridos'
+                });
+            }
+            
+            // Verificar email único
+            const existeEmail = this.usuarios.find(u => u.email === email);
+            if (existeEmail) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'El email ya está registrado'
+                });
+            }
+            
+            const nuevoUsuario = {
+                id: Date.now(),
+                nombre,
+                email,
+                password: this.hashPassword(password),
+                fechaCreacion: new Date()
+            };
+            
+            this.usuarios.push(nuevoUsuario);
+            
+            // No devolver password en respuesta
+            const { password: _, ...usuarioSinPassword } = nuevoUsuario;
+            
+            res.status(201).json({
+                success: true,
+                data: usuarioSinPassword,
+                message: 'Usuario creado exitosamente'
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: 'Error interno del servidor'
+            });
+        }
+    }
+
+    update = (req, res) => {
+        try {
+            const { id } = req.params;
+            const { nombre, email } = req.body;
+            
+            const usuarioIndex = this.usuarios.findIndex(u => u.id == id);
+            
+            if (usuarioIndex === -1) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Usuario no encontrado'
+                });
+            }
+            
+            // Actualizar solo campos proporcionados
+            if (nombre) this.usuarios[usuarioIndex].nombre = nombre;
+            if (email) this.usuarios[usuarioIndex].email = email;
+            
+            const { password: _, ...usuarioSinPassword } = this.usuarios[usuarioIndex];
+            
+            res.json({
+                success: true,
+                data: usuarioSinPassword,
+                message: 'Usuario actualizado exitosamente'
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: 'Error interno del servidor'
+            });
+        }
+    }
+
+    delete = (req, res) => {
+        try {
+            const { id } = req.params;
+            const usuarioIndex = this.usuarios.findIndex(u => u.id == id);
+            
+            if (usuarioIndex === -1) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Usuario no encontrado'
+                });
+            }
+            
+            this.usuarios.splice(usuarioIndex, 1);
+            
+            res.json({
+                success: true,
+                message: 'Usuario eliminado exitosamente'
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                error: 'Error interno del servidor'
+            });
+        }
+    }
+
+    hashPassword = (password) => {
+        // En producción usar bcrypt
+        return Buffer.from(password).toString('base64');
+    }
+}
+
+module.exports = UsuarioController;</code></pre>
+            </div>
+
+            <h3>Rutas de la API</h3>
+            <div class="example">
+                <pre><code>// routes/api/usuarios.js
+const express = require('express');
+const UsuarioController = require('../controllers/UsuarioController');
+
+const router = express.Router();
+const usuarioController = new UsuarioController();
+
+// Middleware de validación
+const validateUserData = (req, res, next) => {
+    const { nombre, email } = req.body;
+    
+    if (req.method === 'POST') {
+        if (!nombre || !email || !req.body.password) {
+            return res.status(400).json({
+                success: false,
+                error: 'Nombre, email y password son requeridos'
+            });
+        }
+    }
+    
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email && !emailRegex.test(email)) {
+        return res.status(400).json({
+            success: false,
+            error: 'Formato de email inválido'
+        });
+    }
+    
+    next();
+};
+
+// Rutas CRUD
+router.get('/', usuarioController.getAll);
+router.get('/:id', usuarioController.getById);
+router.post('/', validateUserData, usuarioController.create);
+router.put('/:id', validateUserData, usuarioController.update);
+router.delete('/:id', usuarioController.delete);
+
+module.exports = router;</code></pre>
+            </div>
+
+            <h3>Configuración del Servidor</h3>
+            <div class="example">
+                <pre><code>// server.js
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const compression = require('compression');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware de seguridad y utilidad
+app.use(helmet());
+app.use(cors());
+app.use(compression());
+app.use(morgan('combined'));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Middleware personalizado de logging
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        console.log(`${req.method} ${req.originalUrl} - ${res.statusCode} - ${duration}ms`);
+    });
+    next();
+});
+
+// Rutas de API
+app.use('/api/usuarios', require('./routes/api/usuarios'));
+app.use('/api/productos', require('./routes/api/productos'));
+
+// Ruta de health check
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
+// Ruta raíz
+app.get('/', (req, res) => {
+    res.json({
+        message: 'API REST con Express.js',
+        version: '1.0.0',
+        endpoints: {
+            usuarios: '/api/usuarios',
+            productos: '/api/productos',
+            health: '/health'
+        }
+    });
+});
+
+// Middleware de manejo de errores
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    
+    if (err.type === 'entity.parse.failed') {
+        return res.status(400).json({
+            success: false,
+            error: 'JSON malformado'
+        });
+    }
+    
+    res.status(500).json({
+        success: false,
+        error: 'Error interno del servidor'
+    });
+});
+
+// Middleware 404
+app.use('*', (req, res) => {
+    res.status(404).json({
+        success: false,
+        error: 'Endpoint no encontrado'
+    });
+});
+
+// Iniciar servidor
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor Express corriendo en puerto ${PORT}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    console.log(`📚 Documentación: http://localhost:${PORT}/`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+    console.log('🛑 Cerrando servidor...');
+    process.exit(0);
+});</code></pre>
+            </div>
+        </section>
+
+        <section id="seguridad" class="section">
+            <h2>Seguridad en Express.js</h2>
+            <h3>Autenticación JWT</h3>
+            <div class="example">
+                <pre><code>// middleware/auth.js
+const jwt = require('jsonwebtoken');
+
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Acceso denegado' });
+    }
+    
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Token inválido' });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+const generateToken = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+};
+
+module.exports = { authenticateToken, generateToken };
+
+// routes/auth.js
+const express = require('express');
+const bcrypt = require('bcrypt');
+const { generateToken } = require('../middleware/auth');
+
+const router = express.Router();
+
+// Simulación de base de datos
+const users = [];
+
+router.post('/register', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        // Verificar si usuario existe
+        const existingUser = users.find(u => u.username === username);
+        if (existingUser) {
+            return res.status(400).json({ error: 'Usuario ya existe' });
+        }
+        
+        // Hash de contraseña
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        
+        // Crear usuario
+        const user = {
+            id: users.length + 1,
+            username,
+            password: hashedPassword
+        };
+        
+        users.push(user);
+        
+        // Generar token
+        const token = generateToken({ id: user.id, username: user.username });
+        
+        res.status(201).json({ token });
+    } catch (error) {
+        res.status(500).json({ error: 'Error en el registro' });
+    }
+});
+
+router.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        // Buscar usuario
+        const user = users.find(u => u.username === username);
+        if (!user) {
+            return res.status(400).json({ error: 'Usuario no encontrado' });
+        }
+        
+        // Verificar contraseña
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            return res.status(400).json({ error: 'Contraseña incorrecta' });
+        }
+        
+        // Generar token
+        const token = generateToken({ id: user.id, username: user.username });
+        
+        res.json({ token });
+    } catch (error) {
+        res.status(500).json({ error: 'Error en el login' });
+    }
+});
+
+module.exports = router;</code></pre>
+            </div>
+
+            <h3>Rate Limiting y Protección</h3>
+            <div class="example">
+                <pre><code>const rateLimit = require('express-rate-limit');
+const slowDown = require('express-slow-down');
+
+// Rate limiting general
+const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 100, // límite de 100 requests por windowMs
+    message: {
+        error: 'Demasiadas solicitudes, intenta más tarde'
+    },
+    standardHeaders: true,
+    legacyHeaders: false
+});
+
+// Rate limiting estricto para auth
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5, // Solo 5 intentos de login por ventana
+    message: {
+        error: 'Demasiados intentos de login, intenta más tarde'
+    }
+});
+
+// Slow down para prevenir ataques de fuerza bruta
+const speedLimiter = slowDown({
+    windowMs: 15 * 60 * 1000,
+    delayAfter: 10, // Después de 10 requests
+    delayMs: 500 // Agregar 500ms de delay por request
+});
+
+// Aplicar limiters
+app.use(generalLimiter);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/login', speedLimiter);
+
+// Sanitización de entrada
+const validator = require('validator');
+const sanitizeInput = (req, res, next) => {
+    // Sanitizar strings
+    for (let key in req.body) {
+        if (typeof req.body[key] === 'string') {
+            req.body[key] = validator.escape(req.body[key]);
+        }
+    }
+    
+    // Validar emails
+    if (req.body.email) {
+        if (!validator.isEmail(req.body.email)) {
+            return res.status(400).json({ error: 'Email inválido' });
+        }
+    }
+    
+    next();
+};
+
+app.use('/api', sanitizeInput);</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Prácticos con Express</h2>
+            <h3>API REST Completa</h3>
+            <p>Construye una API REST completa con autenticación, validación, documentación y tests.</p>
+
+            <h3>Blog Personal</h3>
+            <p>Aplicación de blog con Express, EJS, y base de datos para crear, editar y publicar artículos.</p>
+
+            <h3>E-commerce API</h3>
+            <p>API para tienda online con productos, carrito de compras, pedidos y pagos.</p>
+
+            <h3>Chat Application</h3>
+            <p>Aplicación de chat en tiempo real usando Express y Socket.io.</p>
+
+            <h3>File Upload Service</h3>
+            <p>Servicio para subir, almacenar y servir archivos con Express y Multer.</p>
+        </section>
+    </div>
+</body>
+</html>

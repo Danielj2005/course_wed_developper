@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laravel 11 - Framework PHP Avanzado</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: #ff2d20; color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; font-weight: bold; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #ff2d20; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#instalacion">Instalación</a>
+            <a href="#arquitectura">Arquitectura</a>
+            <a href="#routing">Routing</a>
+            <a href="#eloquent">Eloquent ORM</a>
+            <a href="#blade">Blade Templates</a>
+            <a href="#auth">Autenticación</a>
+            <a href="#api">APIs</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>🔴 Laravel 11 - Framework PHP Avanzado</h1>
+
+        <section id="intro" class="section">
+            <h2>Introducción a Laravel 11</h2>
+            <p>Laravel es un framework de PHP elegante y expresivo que facilita el desarrollo de aplicaciones web robustas y escalables. La versión 11 introduce mejoras significativas en rendimiento y desarrollo.</p>
+            <h3>¿Por qué Laravel?</h3>
+            <ul>
+                <li><strong>Elegante sintaxis:</strong> Código limpio y expresivo</li>
+                <li><strong>ORM poderoso:</strong> Eloquent para bases de datos</li>
+                <li><strong>Routing avanzado:</strong> Sistema de rutas flexible</li>
+                <li><strong>Blade templating:</strong> Motor de plantillas intuitivo</li>
+                <li><strong>Artisan CLI:</strong> Herramientas de línea de comandos</li>
+                <li><strong>Ecosistema rico:</strong> Miles de paquetes disponibles</li>
+                <li><strong>Seguridad integrada:</strong> Protección CSRF, XSS, SQL injection</li>
+                <li><strong>Testing integrado:</strong> PHPUnit y herramientas de testing</li>
+            </ul>
+        </section>
+
+        <section id="instalacion" class="section">
+            <h2>Instalación y Configuración</h2>
+            <h3>Requisitos del Sistema</h3>
+            <ul>
+                <li>PHP >= 8.1</li>
+                <li>Composer</li>
+                <li>Node.js & NPM (para assets)</li>
+                <li>MySQL, PostgreSQL, SQLite, or SQL Server</li>
+            </ul>
+
+            <h3>Instalación con Composer</h3>
+            <div class="example">
+                <pre><code># Instalar Laravel Installer globalmente
+composer global require laravel/installer
+
+# Crear nuevo proyecto Laravel 11
+laravel new mi-proyecto
+cd mi-proyecto
+
+# O usando Composer directamente
+composer create-project laravel/laravel mi-proyecto
+
+# Instalar dependencias
+composer install
+npm install
+
+# Configurar archivo .env
+cp .env.example .env
+php artisan key:generate
+
+# Crear base de datos y ejecutar migraciones
+php artisan migrate
+
+# Iniciar servidor de desarrollo
+php artisan serve</code></pre>
+            </div>
+
+            <h3>Estructura de Directorios</h3>
+            <div class="example">
+                <pre><code>mi-proyecto/
+├── app/                    # Lógica de la aplicación
+│   ├── Console/           # Comandos Artisan
+│   ├── Exceptions/        # Manejo de excepciones
+│   ├── Http/             # Controladores, Middleware
+│   ├── Models/           # Modelos Eloquent
+│   └── Providers/        # Service Providers
+├── bootstrap/             # Inicialización de la app
+├── config/               # Archivos de configuración
+├── database/             # Migraciones, seeds, factories
+│   ├── factories/
+│   ├── migrations/
+│   └── seeders/
+├── public/               # Assets públicos (CSS, JS, imágenes)
+├── resources/            # Vistas, assets sin compilar
+│   ├── css/
+│   ├── js/
+│   └── views/
+├── routes/               # Definición de rutas
+│   ├── api.php
+│   ├── channels.php
+│   ├── console.php
+│   └── web.php
+├── storage/              # Archivos temporales, logs, cache
+├── tests/               # Tests automatizados
+├── vendor/              # Dependencias de Composer
+├── artisan             # CLI de Laravel
+├── composer.json       # Dependencias PHP
+├── package.json        # Dependencias Node.js
+└── webpack.mix.js      # Configuración de assets</code></pre>
+            </div>
+        </section>
+
+        <section id="arquitectura" class="section">
+            <h2>Arquitectura MVC en Laravel</h2>
+            <h3>Modelo-Vista-Controlador</h3>
+            <div class="example">
+                <pre><code>// Modelo (app/Models/User.php)
+&lt;?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class User extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    // Relaciones
+    public function posts()
+    {
+        return $this-&gt;hasMany(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this-&gt;hasMany(Comment::class);
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query-&gt;where('active', true);
+    }
+
+    // Accessors & Mutators
+    public function getNameAttribute($value)
+    {
+        return ucwords($value);
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this-&gt;attributes['password'] = bcrypt($value);
+    }
+}</code></pre>
+            </div>
+
+            <h3>Controlador</h3>
+            <div class="example">
+                <pre><code>// Controlador (app/Http/Controllers/UserController.php)
+&lt;?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+
+class UserController extends Controller
+{
+    public function index()
+    {
+        $users = User::active()-&gt;paginate(15);
+        return view('users.index', compact('users'));
+    }
+
+    public function create()
+    {
+        return view('users.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request-&gt;all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator-&gt;fails()) {
+            return redirect()-&gt;back()
+                        -&gt;withErrors($validator)
+                        -&gt;withInput();
+        }
+
+        User::create([
+            'name' => $request-&gt;name,
+            'email' => $request-&gt;email,
+            'password' => Hash::make($request-&gt;password),
+        ]);
+
+        return redirect()-&gt;route('users.index')
+                        -&gt;with('success', 'Usuario creado exitosamente');
+    }
+
+    public function show(User $user)
+    {
+        return view('users.show', compact('user'));
+    }
+
+    public function edit(User $user)
+    {
+        return view('users.edit', compact('user'));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $request-&gt;validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user-&gt;id,
+        ]);
+
+        $user-&gt;update($request-&gt;only(['name', 'email']));
+
+        return redirect()-&gt;route('users.index')
+                        -&gt;with('success', 'Usuario actualizado exitosamente');
+    }
+
+    public function destroy(User $user)
+    {
+        $user-&gt;delete();
+
+        return redirect()-&gt;route('users.index')
+                        -&gt;with('success', 'Usuario eliminado exitosamente');
+    }
+}</code></pre>
+            </div>
+
+            <h3>Vista con Blade</h3>
+            <div class="example">
+                <pre><code>&lt;!-- Vista (resources/views/users/index.blade.php) --&gt;
+@extends('layouts.app')
+
+@section('title', 'Lista de Usuarios')
+
+@section('content')
+&lt;div class="container"&gt;
+    &lt;div class="row justify-content-center"&gt;
+        &lt;div class="col-md-12"&gt;
+            &lt;div class="card"&gt;
+                &lt;div class="card-header"&gt;
+                    &lt;div class="d-flex justify-content-between align-items-center"&gt;
+                        &lt;h4&gt;Usuarios&lt;/h4&gt;
+                        &lt;a href="{{ route('users.create') }}" class="btn btn-primary"&gt;
+                            Crear Usuario
+                        &lt;/a&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+
+                &lt;div class="card-body"&gt;
+                    @if(session('success'))
+                        &lt;div class="alert alert-success"&gt;
+                            {{ session('success') }}
+                        &lt;/div&gt;
+                    @endif
+
+                    &lt;div class="table-responsive"&gt;
+                        &lt;table class="table table-striped"&gt;
+                            &lt;thead&gt;
+                                &lt;tr&gt;
+                                    &lt;th&gt;ID&lt;/th&gt;
+                                    &lt;th&gt;Nombre&lt;/th&gt;
+                                    &lt;th&gt;Email&lt;/th&gt;
+                                    &lt;th&gt;Fecha de Registro&lt;/th&gt;
+                                    &lt;th&gt;Acciones&lt;/th&gt;
+                                &lt;/tr&gt;
+                            &lt;/thead&gt;
+                            &lt;tbody&gt;
+                                @forelse($users as $user)
+                                    &lt;tr&gt;
+                                        &lt;td&gt;{{ $user-&gt;id }}&lt;/td&gt;
+                                        &lt;td&gt;{{ $user-&gt;name }}&lt;/td&gt;
+                                        &lt;td&gt;{{ $user-&gt;email }}&lt;/td&gt;
+                                        &lt;td&gt;{{ $user-&gt;created_at-&gt;format('d/m/Y') }}&lt;/td&gt;
+                                        &lt;td&gt;
+                                            &lt;a href="{{ route('users.show', $user) }}" 
+                                               class="btn btn-sm btn-info"&gt;Ver&lt;/a&gt;
+                                            &lt;a href="{{ route('users.edit', $user) }}" 
+                                               class="btn btn-sm btn-warning"&gt;Editar&lt;/a&gt;
+                                            &lt;form action="{{ route('users.destroy', $user) }}" 
+                                                  method="POST" class="d-inline"&gt;
+                                                @csrf
+                                                @method('DELETE')
+                                                &lt;button type="submit" class="btn btn-sm btn-danger" 
+                                                        onclick="return confirm('¿Estás seguro?')"&gt;
+                                                    Eliminar
+                                                &lt;/button&gt;
+                                            &lt;/form&gt;
+                                        &lt;/td&gt;
+                                    &lt;/tr&gt;
+                                @empty
+                                    &lt;tr&gt;
+                                        &lt;td colspan="5" class="text-center"&gt;
+                                            No hay usuarios registrados
+                                        &lt;/td&gt;
+                                    &lt;/tr&gt;
+                                @endforelse
+                            &lt;/tbody&gt;
+                        &lt;/table&gt;
+                    &lt;/div&gt;
+
+                    {{ $users-&gt;links() }}
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+@endsection</code></pre>
+            </div>
+        </section>
+
+        <section id="routing" class="section">
+            <h2>Sistema de Routing</h2>
+            <h3>Rutas Web</h3>
+            <div class="example">
+                <pre><code>// routes/web.php
+&lt;?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Rutas básicas
+Route::get('/about', function () {
+    return view('about');
+});
+
+Route::get('/contact', function () {
+    return 'Página de contacto';
+});
+
+// Rutas con parámetros
+Route::get('/user/{id}', function ($id) {
+    return "Perfil del usuario: " . $id;
+});
+
+Route::get('/user/{id}/posts/{postId}', function ($id, $postId) {
+    return "Usuario $id, Post $postId";
+});
+
+// Parámetros opcionales
+Route::get('/category/{category?}', function ($category = 'general') {
+    return "Categoría: " . $category;
+});
+
+// Restricciones en parámetros
+Route::get('/product/{id}', function ($id) {
+    return "Producto: " . $id;
+})-&gt;where('id', '[0-9]+');
+
+Route::get('/article/{slug}', function ($slug) {
+    return "Artículo: " . $slug;
+})-&gt;where('slug', '[a-zA-Z0-9-]+');
+
+// Rutas nombradas
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})-&gt;name('dashboard');
+
+// Rutas con controladores
+Route::get('/users', [UserController::class, 'index'])-&gt;name('users.index');
+Route::get('/users/create', [UserController::class, 'create'])-&gt;name('users.create');
+Route::post('/users', [UserController::class, 'store'])-&gt;name('users.store');
+Route::get('/users/{user}', [UserController::class, 'show'])-&gt;name('users.show');
+Route::get('/users/{user}/edit', [UserController::class, 'edit'])-&gt;name('users.edit');
+Route::put('/users/{user}', [UserController::class, 'update'])-&gt;name('users.update');
+Route::delete('/users/{user}', [UserController::class, 'destroy'])-&gt;name('users.destroy');
+
+// Agrupación de rutas
+Route::prefix('admin')-&gt;group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard']);
+    Route::resource('users', AdminUserController::class);
+});
+
+// Middleware
+Route::middleware(['auth', 'verified'])-&gt;group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+});
+
+// Fallback route
+Route::fallback(function () {
+    return view('errors.404');
+});</code></pre>
+            </div>
+
+            <h3>Route Model Binding</h3>
+            <div class="example">
+                <pre><code>// En routes/web.php
+Route::get('/posts/{post}', [PostController::class, 'show']);
+Route::get('/users/{user}', [UserController::class, 'show']);
+
+// Laravel automáticamente inyecta el modelo
+// Controlador automáticamente recibe el modelo User o Post
+public function show(User $user)
+{
+    // $user ya es una instancia del modelo User
+    return view('users.show', compact('user'));
+}
+
+// Binding personalizado
+public function show($id)
+{
+    $user = User::findOrFail($id);
+    // O con binding personalizado
+    // $user = User::where('slug', $id)-&gt;firstOrFail();
+    
+    return view('users.show', compact('user'));
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="eloquent" class="section">
+            <h2>Eloquent ORM</h2>
+            <h3>Operaciones CRUD</h3>
+            <div class="example">
+                <pre><code>// Crear registros
+$user = new User();
+$user-&gt;name = 'Juan Pérez';
+$user-&gt;email = 'juan@email.com';
+$user-&gt;password = Hash::make('password');
+$user-&gt;save();
+
+// O usando create()
+User::create([
+    'name' => 'María García',
+    'email' => 'maria@email.com',
+    'password' => Hash::make('password')
+]);
+
+// Leer registros
+// Todos los usuarios
+$users = User::all();
+
+// Usuario específico
+$user = User::find(1);
+$user = User::where('email', 'juan@email.com')-&gt;first();
+
+// Múltiples registros con condiciones
+$activeUsers = User::where('active', true)-&gt;get();
+$recentUsers = User::where('created_at', '>', now()-&gt;subDays(7))-&gt;get();
+
+// Paginación
+$users = User::paginate(15);
+$users = User::simplePaginate(15);
+
+// Actualizar registros
+$user = User::find(1);
+$user-&gt;name = 'Juan Carlos Pérez';
+$user-&gt;save();
+
+// O usando update()
+User::where('id', 1)-&gt;update(['name' => 'Juan Carlos Pérez']);
+
+// Eliminar registros
+$user = User::find(1);
+$user-&gt;delete();
+
+// O usando destroy()
+User::destroy(1);
+User::where('active', false)-&gt;delete();</code></pre>
+            </div>
+
+            <h3>Relaciones</h3>
+            <div class="example">
+                <pre><code>// Modelo User
+class User extends Model
+{
+    public function posts()
+    {
+        return $this-&gt;hasMany(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this-&gt;hasMany(Comment::class);
+    }
+
+    public function profile()
+    {
+        return $this-&gt;hasOne(Profile::class);
+    }
+
+    public function roles()
+    {
+        return $this-&gt;belongsToMany(Role::class);
+    }
+
+    public function followers()
+    {
+        return $this-&gt;belongsToMany(User::class, 'follows', 'following_id', 'follower_id');
+    }
+}
+
+// Modelo Post
+class Post extends Model
+{
+    public function user()
+    {
+        return $this-&gt;belongsTo(User::class);
+    }
+
+    public function comments()
+    {
+        return $this-&gt;hasMany(Comment::class);
+    }
+
+    public function tags()
+    {
+        return $this-&gt;belongsToMany(Tag::class);
+    }
+}
+
+// Usando relaciones
+// Obtener posts con usuario
+$posts = Post::with('user')-&gt;get();
+
+// Obtener usuario con posts y comentarios
+$user = User::with(['posts', 'comments'])-&gt;find(1);
+
+// Crear post para usuario
+$user = User::find(1);
+$post = $user-&gt;posts()-&gt;create([
+    'title' => 'Mi primer post',
+    'content' => 'Contenido del post'
+]);
+
+// Adjuntar roles a usuario
+$user-&gt;roles()-&gt;attach([1, 2, 3]);
+$user-&gt;roles()-&gt;detach([2]);
+
+// Consultas con relaciones
+$usersWithPosts = User::has('posts')-&gt;get(); // Usuarios que tienen posts
+$usersWithoutPosts = User::doesntHave('posts')-&gt;get();
+$popularUsers = User::withCount('posts')-&gt;having('posts_count', '>', 5)-&gt;get();</code></pre>
+            </div>
+
+            <h3>Scopes y Mutators</h3>
+            <div class="example">
+                <pre><code>class User extends Model
+{
+    // Scopes locales
+    public function scopeActive($query)
+    {
+        return $query-&gt;where('active', true);
+    }
+
+    public function scopeRecent($query)
+    {
+        return $query-&gt;where('created_at', '>', now()-&gt;subDays(7));
+    }
+
+    public function scopeByName($query, $name)
+    {
+        return $query-&gt;where('name', 'like', "%{$name}%");
+    }
+
+    // Scopes globales
+    protected static function booted()
+    {
+        static::addGlobalScope('active', function (Builder $builder) {
+            $builder-&gt;where('active', true);
+        });
+    }
+
+    // Accessors
+    public function getNameAttribute($value)
+    {
+        return ucwords($value);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this-&gt;name . ' ' . $this-&gt;last_name;
+    }
+
+    // Mutators
+    public function setPasswordAttribute($value)
+    {
+        $this-&gt;attributes['password'] = Hash::make($value);
+    }
+
+    public function setEmailAttribute($value)
+    {
+        $this-&gt;attributes['email'] = strtolower($value);
+    }
+
+    // Casts
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
+        'settings' => 'array',
+        'birth_date' => 'date',
+    ];
+}
+
+// Usando scopes
+$activeUsers = User::active()-&gt;get();
+$recentActiveUsers = User::active()-&gt;recent()-&gt;get();
+$usersNamedJuan = User::byName('Juan')-&gt;get();</code></pre>
+            </div>
+        </section>
+
+        <section id="blade" class="section">
+            <h2>Blade Templates</h2>
+            <h3>Sintaxis Básica</h3>
+            <div class="example">
+                <pre><code>&lt;!-- resources/views/welcome.blade.php --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="{{ str_replace('_', '-', app()-&gt;getLocale()) }}"&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;{{ config('app.name', 'Laravel') }}&lt;/title&gt;
+
+    &lt;!-- Fonts --&gt;
+    &lt;link rel="preconnect" href="https://fonts.bunny.net"&gt;
+    &lt;link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" /&gt;
+
+    &lt;!-- Scripts --&gt;
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+&lt;/head&gt;
+&lt;body class="antialiased"&gt;
+    &lt;div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white"&gt;
+        @if (Route::has('login'))
+            &lt;div class="sm:fixed sm:top-0 sm:right-0 p-6 text-right z-10"&gt;
+                @auth
+                    &lt;a href="{{ url('/dashboard') }}" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"&gt;Dashboard&lt;/a&gt;
+                @else
+                    &lt;a href="{{ route('login') }}" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"&gt;Log in&lt;/a&gt;
+
+                    @if (Route::has('register'))
+                        &lt;a href="{{ route('register') }}" class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"&gt;Register&lt;/a&gt;
+                    @endif
+                @endauth
+            &lt;/div&gt;
+        @endif
+
+        &lt;div class="max-w-7xl mx-auto p-6 lg:p-8"&gt;
+            &lt;div class="flex justify-center"&gt;
+                &lt;svg viewBox="0 0 316 316" xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-red-500"&gt;
+                    &lt;path d="m211.4 168.8c-2.3-4.5-6.7-7.5-11.7-7.5h-17.8c-3.6 0-6.9 1.9-8.7 5.1l-8.7 15.1c-1.8 3.2-5.1 5.1-8.7 5.1h-80.6c-3.6 0-6.9-1.9-8.7-5.1l-8.7-15.1c-1.8-3.2-5.1-5.1-8.7-5.1h-17.8c-5 0-9.4 3-11.7 7.5l-8.7 15.1c-2.3 4-1.1 9.1 2.7 12.2l75.8 75.8c3.8 3.8 10 3.8 13.8 0l75.8-75.8c3.8-3.1 5-8.2 2.7-12.2l-8.7-15.1z"/&gt;
+                    &lt;path d="m168.8 104.6c2.3 4.5 6.7 7.5 11.7 7.5h17.8c3.6 0 6.9-1.9 8.7-5.1l8.7-15.1c1.8-3.2 5.1-5.1 8.7-5.1h80.6c3.6 0 6.9 1.9 8.7 5.1l8.7 15.1c1.8 3.2 5.1 5.1 8.7 5.1h17.8c5 0 9.4-3 11.7-7.5l8.7-15.1c2.3-4 1.1-9.1-2.7-12.2l-75.8-75.8c-3.8-3.8-10-3.8-13.8 0l-75.8 75.8c-3.8 3.1-5 8.2-2.7 12.2l8.7 15.1z"/&gt;
+                    &lt;path d="m104.6 147.2c4.5 2.3 7.5 6.7 7.5 11.7v17.8c0 3.6-1.9 6.9-5.1 8.7l-15.1 8.7c-3.2 1.8-5.1 5.1-5.1 8.7v80.6c0 3.6 1.9 6.9 5.1 8.7l15.1 8.7c3.2 1.8 5.1 5.1 5.1 8.7v17.8c0 5-3 9.4-7.5 11.7l-15.1 8.7c-4 2.3-9.1 1.1-12.2-2.7l-75.8-75.8c-3.8-3.8-3.8-10 0-13.8l75.8-75.8c3.1-3.8 8.2-5 12.2-2.7l15.1 8.7z"/&gt;
+                    &lt;path d="m147.2 211.4c-4.5-2.3-7.5-6.7-7.5-11.7v-17.8c0-3.6 1.9-6.9 5.1-8.7l15.1-8.7c3.2-1.8 5.1-5.1 5.1-8.7v-80.6c0-3.6-1.9-6.9-5.1-8.7l-15.1-8.7c-3.2-1.8-5.1-5.1-5.1-8.7v-17.8c0-5 3-9.4 7.5-11.7l15.1-8.7c4-2.3 9.1-1.1 12.2 2.7l75.8 75.8c3.8 3.8 3.8 10 0 13.8l-75.8 75.8c-3.1 3.8-8.2 5-12.2 2.7l-15.1-8.7z"/&gt;
+                &lt;/svg&gt;
+            &lt;/div&gt;
+
+            &lt;div class="mt-16 text-center"&gt;
+                &lt;h1 class="text-4xl font-bold text-gray-900 dark:text-white"&gt;
+                    Laravel
+                &lt;/h1&gt;
+
+                &lt;p class="mt-6 text-lg text-gray-500 dark:text-gray-400 leading-relaxed"&gt;
+                    Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in most web projects.
+                &lt;/p&gt;
+
+                &lt;div class="mt-8 flex justify-center space-x-4"&gt;
+                    @if (Route::has('login'))
+                        &lt;a href="{{ route('login') }}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition duration-200"&gt;
+                            Get started
+                        &lt;/a&gt;
+                    @endif
+
+                    &lt;a href="https://laravel.com/docs" class="border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-bold py-3 px-6 rounded-lg transition duration-200"&gt;
+                        Documentation
+                    &lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;style&gt;
+        .bg-dots-darker {
+            background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E");
+        }
+        .dark .bg-dots-lighter {
+            background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(255,255,255,0.07)'/%3E%3C/svg%3E");
+        }
+    &lt;/style&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+
+            <h3>Directivas de Blade</h3>
+            <div class="example">
+                <pre><code>&lt;!-- Directivas de control --&gt;
+@if($user-&gt;isAdmin())
+    &lt;p&gt;Bienvenido, Administrador!&lt;/p&gt;
+@elseif($user-&gt;isModerator())
+    &lt;p&gt;Bienvenido, Moderador!&lt;/p&gt;
+@else
+    &lt;p&gt;Bienvenido, Usuario!&lt;/p&gt;
+@endif
+
+&lt;!-- Bucles --&gt;
+@for($i = 0; $i &lt; 10; $i++)
+    &lt;p&gt;Número: {{ $i }}&lt;/p&gt;
+@endfor
+
+@foreach($users as $user)
+    &lt;p&gt;{{ $user-&gt;name }}&lt;/p&gt;
+@endforeach
+
+@forelse($posts as $post)
+    &lt;div&gt;{{ $post-&gt;title }}&lt;/div&gt;
+@empty
+    &lt;p&gt;No hay posts disponibles&lt;/p&gt;
+@endforelse
+
+&lt;!-- Incluir vistas --&gt;
+@include('partials.header', ['title' => 'Mi Página'])
+
+&lt;!-- Componentes --&gt;
+&lt;x-alert type="success" message="Operación exitosa" /&gt;
+
+&lt;!-- Stacks --&gt;
+@push('scripts')
+    &lt;script src="custom.js"&gt;&lt;/script&gt;
+@endpush
+
+@stack('scripts')
+
+&lt;!-- Secciones --&gt;
+@section('sidebar')
+    &lt;p&gt;Contenido del sidebar&lt;/p&gt;
+@endsection
+
+@yield('sidebar')</code></pre>
+            </div>
+        </section>
+
+        <section id="auth" class="section">
+            <h2>Autenticación y Autorización</h2>
+            <h3>Laravel Breeze (Autenticación Simple)</h3>
+            <div class="example">
+                <pre><code># Instalar Breeze
+composer require laravel/breeze --dev
+php artisan breeze:install
+
+# Instalar dependencias de frontend
+npm install
+npm run build
+
+# Ejecutar migraciones
+php artisan migrate
+
+# Rutas generadas automáticamente
+GET  /login
+POST /login
+POST /logout
+GET  /register
+POST /register
+GET  /dashboard</code></pre>
+            </div>
+
+            <h3>Middleware de Autenticación</h3>
+            <div class="example">
+                <pre><code>// Middleware personalizado
+php artisan make:middleware CheckAge
+
+// app/Http/Middleware/CheckAge.php
+&lt;?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class CheckAge
+{
+    public function handle(Request $request, Closure $next, $minAge = 18)
+    {
+        if ($request-&gt;user() && $request-&gt;user()-&gt;age &lt; $minAge) {
+            return response('Acceso denegado: Debes ser mayor de edad', 403);
+        }
+
+        return $next($request);
+    }
+}
+
+// Registrar middleware en app/Http/Kernel.php
+protected $routeMiddleware = [
+    // ... otros middleware
+    'check.age' => \App\Http\Middleware\CheckAge::class,
+];
+
+// Usar middleware en rutas
+Route::get('/adult-content', [ContentController::class, 'adult'])
+    -&gt;middleware('auth', 'check.age:21');</code></pre>
+            </div>
+
+            <h3>Authorization con Gates y Policies</h3>
+            <div class="example">
+                <pre><code>// Gates en app/Providers/AppServiceProvider.php
+use Illuminate\Support\Facades\Gate;
+
+public function boot()
+{
+    Gate::define('update-post', function ($user, $post) {
+        return $user-&gt;id === $post-&gt;user_id || $user-&gt;hasRole('admin');
+    });
+
+    Gate::define('delete-user', function ($user, $targetUser) {
+        return $user-&gt;hasRole('admin') && $user-&gt;id !== $targetUser-&gt;id;
+    });
+}
+
+// Usar gates en controladores
+public function update(Request $request, Post $post)
+{
+    Gate::authorize('update-post', $post);
+    
+    // Lógica de actualización
+}
+
+// Policy
+php artisan make:policy PostPolicy --model=Post
+
+// app/Policies/PostPolicy.php
+class PostPolicy
+{
+    public function update(User $user, Post $post)
+    {
+        return $user-&gt;id === $post-&gt;user_id || $user-&gt;hasRole('admin');
+    }
+
+    public function delete(User $user, Post $post)
+    {
+        return $user-&gt;id === $post-&gt;user_id || $user-&gt;hasRole('admin');
+    }
+}
+
+// Registrar policy en AuthServiceProvider
+protected $policies = [
+    Post::class => PostPolicy::class,
+];
+
+// Usar policy en controladores
+public function update(Request $request, Post $post)
+{
+    $this-&gt;authorize('update', $post);
+    
+    // Lógica de actualización
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="api" class="section">
+            <h2>APIs REST con Laravel</h2>
+            <h3>API Routes y Controllers</h3>
+            <div class="example">
+                <pre><code>// routes/api.php
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\PostController;
+
+Route::apiResource('users', UserController::class);
+Route::apiResource('posts', PostController::class);
+
+// Rutas de autenticación API
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])-&gt;middleware('auth:sanctum');
+
+// Rutas protegidas
+Route::middleware('auth:sanctum')-&gt;group(function () {
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::apiResource('comments', CommentController::class);
+});</code></pre>
+            </div>
+
+            <h3>API Controller</h3>
+            <div class="example">
+                <pre><code>// app/Http/Controllers/API/UserController.php
+&lt;?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+
+class UserController extends Controller
+{
+    public function index()
+    {
+        $users = User::paginate(15);
+        return response()-&gt;json($users);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request-&gt;all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        if ($validator-&gt;fails()) {
+            return response()-&gt;json([
+                'success' => false,
+                'errors' => $validator-&gt;errors()
+            ], 422);
+        }
+
+        $user = User::create([
+            'name' => $request-&gt;name,
+            'email' => $request-&gt;email,
+            'password' => Hash::make($request-&gt;password),
+        ]);
+
+        return response()-&gt;json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'Usuario creado exitosamente'
+        ], 201);
+    }
+
+    public function show(User $user)
+    {
+        return response()-&gt;json([
+            'success' => true,
+            'data' => $user-&gt;load('posts')
+        ]);
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $this-&gt;authorize('update', $user);
+
+        $validator = Validator::make($request-&gt;all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user-&gt;id,
+        ]);
+
+        if ($validator-&gt;fails()) {
+            return response()-&gt;json([
+                'success' => false,
+                'errors' => $validator-&gt;errors()
+            ], 422);
+        }
+
+        $user-&gt;update($request-&gt;only(['name', 'email']));
+
+        return response()-&gt;json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'Usuario actualizado exitosamente'
+        ]);
+    }
+
+    public function destroy(User $user)
+    {
+        $this-&gt;authorize('delete', $user);
+        
+        $user-&gt;delete();
+
+        return response()-&gt;json([
+            'success' => true,
+            'message' => 'Usuario eliminado exitosamente'
+        ]);
+    }
+}</code></pre>
+            </div>
+
+            <h3>Laravel Sanctum para APIs</h3>
+            <div class="example">
+                <pre><code># Instalar Sanctum
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan migrate
+
+// Configurar API middleware en app/Http/Kernel.php
+'api' => [
+    \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+    'throttle:api',
+    \Illuminate\Routing\Middleware\SubstituteBindings::class,
+],
+
+// Modelo User
+use Laravel\Sanctum\HasApiTokens;
+
+class User extends Authenticatable
+{
+    use HasApiTokens, HasFactory, Notifiable;
+}
+
+// Controlador de autenticación
+public function login(Request $request)
+{
+    $credentials = $request-&gt;only('email', 'password');
+    
+    if (Auth::attempt($credentials)) {
+        $user = Auth::user();
+        $token = $user-&gt;createToken('API Token')-&gt;plainTextToken;
+        
+        return response()-&gt;json([
+            'success' => true,
+            'user' => $user,
+            'token' => $token
+        ]);
+    }
+    
+    return response()-&gt;json([
+        'success' => false,
+        'message' => 'Credenciales inválidas'
+    ], 401);
+}
+
+public function logout(Request $request)
+{
+    $request-&gt;user()-&gt;currentAccessToken()-&gt;delete();
+    
+    return response()-&gt;json([
+        'success' => true,
+        'message' => 'Sesión cerrada exitosamente'
+    ]);
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Prácticos con Laravel</h2>
+            <h3>Blog Personal</h3>
+            <p>Sistema completo de blog con artículos, categorías, comentarios y panel de administración.</p>
+
+            <h3>E-commerce</h3>
+            <p>Tienda online con productos, carrito de compras, pagos y gestión de pedidos.</p>
+
+            <h3>Red Social</h3>
+            <p>Plataforma de red social con usuarios, posts, likes, comentarios y mensajería.</p>
+
+            <h3>API REST</h3>
+            <p>API RESTful completa con documentación, autenticación y rate limiting.</p>
+
+            <h3>Sistema de Gestión</h3>
+            <p>ERP básico con módulos de inventario, ventas, compras y reportes.</p>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python - Desarrollo Web con Django y Flask</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; }
+        .nav { background: linear-gradient(135deg, #3776ab, #ffd43b); color: white; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .nav a { color: white; margin-right: 15px; text-decoration: none; font-weight: bold; }
+        .section { margin-bottom: 30px; }
+        code { background: #f8f8f8; padding: 2px 5px; border-radius: 3px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .example { border-left: 4px solid #3776ab; padding-left: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#intro">Introducción</a>
+            <a href="#django">Django</a>
+            <a href="#flask">Flask</a>
+            <a href="#sqlite">SQLite</a>
+            <a href="#comparacion">Comparación</a>
+            <a href="#proyectos">Proyectos</a>
+        </div>
+
+        <h1>🐍 Python - Desarrollo Web con Django y Flask</h1>
+
+        <section id="intro" class="section">
+            <h2>Introducción al Desarrollo Web con Python</h2>
+            <p>Python ofrece dos frameworks principales para desarrollo web: Django (framework completo) y Flask (microframework). Ambos son poderosos pero sirven para diferentes casos de uso.</p>
+            <h3>¿Por qué Python para Web?</h3>
+            <ul>
+                <li><strong>Sintaxis clara y legible:</strong> Código fácil de mantener</li>
+                <li><strong>Gran ecosistema:</strong> Miles de librerías disponibles</li>
+                <li><strong>Productividad:</strong> Desarrollo rápido de aplicaciones</li>
+                <li><strong>Escalabilidad:</strong> Apto para aplicaciones de cualquier tamaño</li>
+                <li><strong>Comunidad activa:</strong> Soporte y documentación extensos</li>
+            </ul>
+        </section>
+
+        <section id="django" class="section">
+            <h2>Django - Framework Completo</h2>
+            <h3>¿Qué es Django?</h3>
+            <p>Django es un framework web de alto nivel que fomenta el desarrollo rápido y el diseño limpio. Incluye todo lo necesario para construir aplicaciones web complejas.</p>
+
+            <h3>Instalación y Configuración</h3>
+            <div class="example">
+                <pre><code># Instalar Django
+pip install django
+
+# Crear proyecto
+django-admin startproject mi_proyecto
+cd mi_proyecto
+
+# Crear aplicación
+python manage.py startapp mi_app
+
+# Ejecutar servidor de desarrollo
+python manage.py runserver
+
+# Crear migraciones
+python manage.py makemigrations
+python manage.py migrate
+
+# Crear superusuario
+python manage.py createsuperuser</code></pre>
+            </div>
+
+            <h3>Estructura de un Proyecto Django</h3>
+            <div class="example">
+                <pre><code>mi_proyecto/
+├── manage.py              # Script de gestión
+├── mi_proyecto/          # Configuración del proyecto
+│   ├── __init__.py
+│   ├── settings.py       # Configuración global
+│   ├── urls.py          # URLs del proyecto
+│   ├── wsgi.py          # WSGI para producción
+│   └── asgi.py          # ASGI para async
+├── mi_app/               # Aplicación Django
+│   ├── __init__.py
+│   ├── admin.py         # Configuración del admin
+│   ├── apps.py          # Configuración de la app
+│   ├── models.py        # Modelos de datos
+│   ├── views.py         # Vistas (lógica)
+│   ├── urls.py          # URLs de la app
+│   ├── forms.py         # Formularios
+│   ├── templates/       # Plantillas HTML
+│   └── static/          # Archivos estáticos
+└── db.sqlite3           # Base de datos SQLite</code></pre>
+            </div>
+
+            <h3>Modelos y Base de Datos</h3>
+            <div class="example">
+                <pre><code># mi_app/models.py
+from django.db import models
+from django.contrib.auth.models import User
+
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.TextField(blank=True)
+    slug = models.SlugField(unique=True)
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Categoría"
+        verbose_name_plural = "Categorías"
+        ordering = ['nombre']
+    
+    def __str__(self):
+        return self.nombre
+
+class Producto(models.Model):
+    nombre = models.CharField(max_length=200)
+    descripcion = models.TextField()
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    stock = models.PositiveIntegerField(default=0)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    imagen = models.ImageField(upload_to='productos/', blank=True)
+    disponible = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.nombre
+    
+    @property
+    def precio_formateado(self):
+        return f"${self.precio:,.2f}"
+
+class Pedido(models.Model):
+    ESTADOS = [
+        ('pendiente', 'Pendiente'),
+        ('procesando', 'Procesando'),
+        ('enviado', 'Enviado'),
+        ('entregado', 'Entregado'),
+        ('cancelado', 'Cancelado'),
+    ]
+    
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha_pedido = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    def __str__(self):
+        return f"Pedido {self.id} - {self.usuario.username}"
+
+class DetallePedido(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    @property
+    def subtotal(self):
+        return self.cantidad * self.precio_unitario</code></pre>
+            </div>
+
+            <h3>Vistas y URLs</h3>
+            <div class="example">
+                <pre><code># mi_app/views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q
+from .models import Producto, Categoria, Pedido, DetallePedido
+from .forms import ProductoForm
+
+def home(request):
+    productos_destacados = Producto.objects.filter(disponible=True)[:6]
+    categorias = Categoria.objects.filter(activo=True)
+    
+    context = {
+        'productos_destacados': productos_destacados,
+        'categorias': categorias,
+    }
+    return render(request, 'mi_app/home.html', context)
+
+def lista_productos(request):
+    productos = Producto.objects.filter(disponible=True)
+    categoria_id = request.GET.get('categoria')
+    
+    if categoria_id:
+        productos = productos.filter(categoria_id=categoria_id)
+    
+    query = request.GET.get('q')
+    if query:
+        productos = productos.filter(
+            Q(nombre__icontains=query) |
+            Q(descripcion__icontains=query)
+        )
+    
+    context = {
+        'productos': productos,
+        'query': query,
+    }
+    return render(request, 'mi_app/productos.html', context)
+
+def detalle_producto(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id, disponible=True)
+    
+    context = {
+        'producto': producto,
+    }
+    return render(request, 'mi_app/detalle_producto.html', context)
+
+@login_required
+def agregar_al_carrito(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id, disponible=True)
+    
+    # Lógica del carrito (usando sesiones)
+    carrito = request.session.get('carrito', {})
+    producto_id_str = str(producto_id)
+    
+    if producto_id_str in carrito:
+        carrito[producto_id_str]['cantidad'] += 1
+    else:
+        carrito[producto_id_str] = {
+            'nombre': producto.nombre,
+            'precio': str(producto.precio),
+            'cantidad': 1,
+        }
+    
+    request.session['carrito'] = carrito
+    messages.success(request, f'{producto.nombre} agregado al carrito')
+    
+    return redirect('carrito')
+
+@login_required
+def ver_carrito(request):
+    carrito = request.session.get('carrito', {})
+    total = 0
+    
+    for item in carrito.values():
+        total += float(item['precio']) * item['cantidad']
+    
+    context = {
+        'carrito': carrito,
+        'total': total,
+    }
+    return render(request, 'mi_app/carrito.html', context)</code></pre>
+            </div>
+
+            <h3>URLs y Forms</h3>
+            <div class="example">
+                <pre><code># mi_app/urls.py
+from django.urls import path
+from . import views
+
+app_name = 'mi_app'
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('productos/', views.lista_productos, name='productos'),
+    path('productos/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
+    path('productos/<int:producto_id>/agregar/', views.agregar_al_carrito, name='agregar_carrito'),
+    path('carrito/', views.ver_carrito, name='carrito'),
+]
+
+# mi_proyecto/urls.py
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('mi_app.urls')),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# mi_app/forms.py
+from django import forms
+from .models import Producto
+
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = ['nombre', 'descripcion', 'precio', 'stock', 'categoria', 'imagen']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={'rows': 4}),
+            'precio': forms.NumberInput(attrs={'step': '0.01'}),
+        }
+    
+    def clean_precio(self):
+        precio = self.cleaned_data.get('precio')
+        if precio <= 0:
+            raise forms.ValidationError('El precio debe ser mayor a 0')
+        return precio</code></pre>
+            </div>
+
+            <h3>Admin de Django</h3>
+            <div class="example">
+                <pre><code># mi_app/admin.py
+from django.contrib import admin
+from .models import Producto, Categoria, Pedido, DetallePedido
+
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'activo', 'fecha_creacion']
+    list_filter = ['activo', 'fecha_creacion']
+    search_fields = ['nombre', 'descripcion']
+    prepopulated_fields = {'slug': ('nombre',)}
+
+@admin.register(Producto)
+class ProductoAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'precio_formateado', 'stock', 'categoria', 'disponible']
+    list_filter = ['disponible', 'categoria', 'fecha_creacion']
+    search_fields = ['nombre', 'descripcion']
+    list_editable = ['precio', 'stock', 'disponible']
+    readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+    
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('nombre', 'descripcion', 'categoria')
+        }),
+        ('Precios y Stock', {
+            'fields': ('precio', 'stock', 'disponible')
+        }),
+        ('Multimedia', {
+            'fields': ('imagen',)
+        }),
+        ('Fechas', {
+            'fields': ('fecha_creacion', 'fecha_actualizacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(Pedido)
+class PedidoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'usuario', 'estado', 'total', 'fecha_pedido']
+    list_filter = ['estado', 'fecha_pedido']
+    search_fields = ['usuario__username', 'usuario__email']
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('usuario')</code></pre>
+            </div>
+
+            <h3>Templates con Django</h3>
+            <div class="example">
+                <pre><code>&lt;!-- templates/base.html --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block title %}Mi Tienda{% endblock %}&lt;/title&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+    {% block extra_head %}{% endblock %}
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark"&gt;
+        &lt;div class="container"&gt;
+            &lt;a class="navbar-brand" href="{% url 'mi_app:home' %}"&gt;Mi Tienda&lt;/a&gt;
+            
+            &lt;div class="navbar-nav ms-auto"&gt;
+                &lt;a class="nav-link" href="{% url 'mi_app:productos' %}"&gt;Productos&lt;/a&gt;
+                {% if user.is_authenticated %}
+                    &lt;a class="nav-link" href="{% url 'mi_app:carrito' %}"&gt;Carrito&lt;/a&gt;
+                    &lt;a class="nav-link" href="{% url 'logout' %}"&gt;Salir&lt;/a&gt;
+                {% else %}
+                    &lt;a class="nav-link" href="{% url 'login' %}"&gt;Entrar&lt;/a&gt;
+                {% endif %}
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+    
+    &lt;main class="container mt-4"&gt;
+        {% if messages %}
+            {% for message in messages %}
+                &lt;div class="alert alert-{{ message.tags }}"&gt;{{ message }}&lt;/div&gt;
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    &lt;/main&gt;
+    
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+    {% block extra_js %}{% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;
+
+&lt;!-- templates/mi_app/productos.html --&gt;
+{% extends 'base.html' %}
+
+{% block title %}Productos - {{ block.super }}{% endblock %}
+
+{% block content %}
+&lt;div class="row"&gt;
+    &lt;div class="col-md-12"&gt;
+        &lt;h1&gt;Productos&lt;/h1&gt;
+        
+        &lt;!-- Filtros --&gt;
+        &lt;form method="get" class="mb-4"&gt;
+            &lt;div class="row"&gt;
+                &lt;div class="col-md-6"&gt;
+                    &lt;input type="text" name="q" class="form-control" 
+                           placeholder="Buscar productos..." value="{{ query }}"&gt;
+                &lt;/div&gt;
+                &lt;div class="col-md-4"&gt;
+                    &lt;select name="categoria" class="form-select"&gt;
+                        &lt;option value=""&gt;Todas las categorías&lt;/option&gt;
+                        {% for categoria in categorias %}
+                            &lt;option value="{{ categoria.id }}" 
+                                    {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}&gt;
+                                {{ categoria.nombre }}
+                            &lt;/option&gt;
+                        {% endfor %}
+                    &lt;/select&gt;
+                &lt;/div&gt;
+                &lt;div class="col-md-2"&gt;
+                    &lt;button type="submit" class="btn btn-primary w-100"&gt;Buscar&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/form&gt;
+        
+        &lt;!-- Productos --&gt;
+        &lt;div class="row"&gt;
+            {% for producto in productos %}
+                &lt;div class="col-md-4 mb-4"&gt;
+                    &lt;div class="card h-100"&gt;
+                        {% if producto.imagen %}
+                            &lt;img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}"&gt;
+                        {% endif %}
+                        &lt;div class="card-body d-flex flex-column"&gt;
+                            &lt;h5 class="card-title"&gt;{{ producto.nombre }}&lt;/h5&gt;
+                            &lt;p class="card-text"&gt;{{ producto.descripcion|truncatechars:100 }}&lt;/p&gt;
+                            &lt;p class="card-text"&gt;&lt;strong&gt;{{ producto.precio_formateado }}&lt;/strong&gt;&lt;/p&gt;
+                            &lt;a href="{% url 'mi_app:detalle_producto' producto.id %}" 
+                               class="btn btn-primary mt-auto"&gt;Ver Detalles&lt;/a&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/div&gt;
+            {% empty %}
+                &lt;div class="col-12"&gt;
+                    &lt;div class="alert alert-info"&gt;No se encontraron productos.&lt;/div&gt;
+                &lt;/div&gt;
+            {% endfor %}
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+{% endblock %}</code></pre>
+            </div>
+        </section>
+
+        <section id="flask" class="section">
+            <h2>Flask - Microframework</h2>
+            <h3>¿Qué es Flask?</h3>
+            <p>Flask es un microframework web ligero y flexible para Python. Es minimalista pero extensible, ideal para APIs, prototipos y aplicaciones pequeñas a medianas.</p>
+
+            <h3>Instalación y Primera App</h3>
+            <div class="example">
+                <pre><code># Instalar Flask
+pip install flask
+
+# app.py
+from flask import Flask, render_template, request, redirect, url_for, flash
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'tu_clave_secreta_aqui'
+
+@app.route('/')
+def home():
+    return render_template('home.html', titulo='Inicio')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre')
+        email = request.form.get('email')
+        mensaje = request.form.get('mensaje')
+        
+        # Procesar el formulario
+        flash('Mensaje enviado exitosamente', 'success')
+        return redirect(url_for('contact'))
+    
+    return render_template('contact.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)</code></pre>
+            </div>
+
+            <h3>Routing y Vistas</h3>
+            <div class="example">
+                <pre><code># app.py - Rutas avanzadas
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from werkzeug.utils import secure_filename
+import os
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'tu_clave_secreta'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+
+# Crear directorio de uploads si no existe
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Datos de ejemplo
+productos = [
+    {'id': 1, 'nombre': 'Producto 1', 'precio': 10.99},
+    {'id': 2, 'nombre': 'Producto 2', 'precio': 15.50},
+    {'id': 3, 'nombre': 'Producto 3', 'precio': 8.75},
+]
+
+@app.route('/')
+def index():
+    return render_template('index.html', productos=productos)
+
+@app.route('/producto/<int:producto_id>')
+def producto(producto_id):
+    producto = next((p for p in productos if p['id'] == producto_id), None)
+    if producto is None:
+        return render_template('404.html'), 404
+    return render_template('producto.html', producto=producto)
+
+@app.route('/buscar')
+def buscar():
+    query = request.args.get('q', '')
+    if query:
+        resultados = [p for p in productos if query.lower() in p['nombre'].lower()]
+    else:
+        resultados = productos
+    
+    return render_template('buscar.html', resultados=resultados, query=query)
+
+@app.route('/api/productos')
+def api_productos():
+    return jsonify(productos)
+
+@app.route('/api/productos/<int:producto_id>')
+def api_producto(producto_id):
+    producto = next((p for p in productos if p['id'] == producto_id), None)
+    if producto is None:
+        return jsonify({'error': 'Producto no encontrado'}), 404
+    return jsonify(producto)
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        if 'archivo' not in request.files:
+            flash('No se seleccionó ningún archivo', 'error')
+            return redirect(request.url)
+        
+        archivo = request.files['archivo']
+        if archivo.filename == '':
+            flash('No se seleccionó ningún archivo', 'error')
+            return redirect(request.url)
+        
+        if archivo and allowed_file(archivo.filename):
+            filename = secure_filename(archivo.filename)
+            archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('Archivo subido exitosamente', 'success')
+            return redirect(url_for('upload'))
+    
+    return render_template('upload.html')
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Error handlers
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return render_template('500.html'), 500</code></pre>
+            </div>
+
+            <h3>Templates con Jinja2</h3>
+            <div class="example">
+                <pre><code>&lt;!-- templates/base.html --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block title %}Mi App Flask{% endblock %}&lt;/title&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+    {% block head %}{% endblock %}
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar navbar-expand-lg navbar-dark bg-dark"&gt;
+        &lt;div class="container"&gt;
+            &lt;a class="navbar-brand" href="{{ url_for('index') }}"&gt;Mi App&lt;/a&gt;
+            
+            &lt;div class="navbar-nav"&gt;
+                &lt;a class="nav-link" href="{{ url_for('index') }}"&gt;Inicio&lt;/a&gt;
+                &lt;a class="nav-link" href="{{ url_for('buscar') }}"&gt;Buscar&lt;/a&gt;
+                &lt;a class="nav-link" href="{{ url_for('contact') }}"&gt;Contacto&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/nav&gt;
+    
+    &lt;main class="container mt-4"&gt;
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    &lt;div class="alert alert-{{ 'danger' if category == 'error' else category }}"&gt;
+                        {{ message }}
+                    &lt;/div&gt;
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    &lt;/main&gt;
+    
+    &lt;footer class="bg-light text-center py-3 mt-5"&gt;
+        &lt;p&gt;&amp;copy; 2024 Mi App Flask&lt;/p&gt;
+    &lt;/footer&gt;
+    
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+    {% block scripts %}{% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;
+
+&lt;!-- templates/index.html --&gt;
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - {{ super() }}{% endblock %}
+
+{% block content %}
+&lt;div class="row"&gt;
+    &lt;div class="col-md-12"&gt;
+        &lt;h1&gt;Bienvenido a Mi Tienda&lt;/h1&gt;
+        &lt;p class="lead"&gt;Descubre nuestros productos&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="row"&gt;
+    {% for producto in productos %}
+        &lt;div class="col-md-4 mb-4"&gt;
+            &lt;div class="card h-100"&gt;
+                &lt;div class="card-body"&gt;
+                    &lt;h5 class="card-title"&gt;{{ producto.nombre }}&lt;/h5&gt;
+                    &lt;p class="card-text"&gt;Precio: ${{ producto.precio }}&lt;/p&gt;
+                    &lt;a href="{{ url_for('producto', producto_id=producto.id) }}" 
+                       class="btn btn-primary"&gt;Ver Detalles&lt;/a&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    {% else %}
+        &lt;div class="col-12"&gt;
+            &lt;div class="alert alert-info"&gt;No hay productos disponibles.&lt;/div&gt;
+        &lt;/div&gt;
+    {% endfor %}
+&lt;/div&gt;
+{% endblock %}</code></pre>
+            </div>
+
+            <h3>Base de Datos con SQLAlchemy</h3>
+            <div class="example">
+                <pre><code># Instalar SQLAlchemy
+pip install flask-sqlalchemy
+
+# app.py - Configuración de BD
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'tu_clave_secreta'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# Modelos
+class Usuario(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relaciones
+    posts = db.relationship('Post', backref='autor', lazy=True)
+    
+    def __repr__(self):
+        return f'&lt;Usuario {self.nombre}&gt;'
+
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(200), nullable=False)
+    contenido = db.Column(db.Text, nullable=False)
+    fecha_publicacion = db.Column(db.DateTime, default=datetime.utcnow)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    
+    def __repr__(self):
+        return f'&lt;Post {self.titulo}&gt;'
+
+# Crear tablas
+with app.app_context():
+    db.create_all()
+
+# Rutas CRUD
+@app.route('/usuarios')
+def listar_usuarios():
+    usuarios = Usuario.query.all()
+    return render_template('usuarios.html', usuarios=usuarios)
+
+@app.route('/usuario/<int:id>')
+def ver_usuario(id):
+    usuario = Usuario.query.get_or_404(id)
+    return render_template('usuario.html', usuario=usuario)
+
+@app.route('/crear-usuario', methods=['GET', 'POST'])
+def crear_usuario():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        email = request.form['email']
+        
+        nuevo_usuario = Usuario(nombre=nombre, email=email)
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+        
+        flash('Usuario creado exitosamente', 'success')
+        return redirect(url_for('listar_usuarios'))
+    
+    return render_template('crear_usuario.html')
+
+@app.route('/posts')
+def listar_posts():
+    posts = Post.query.order_by(Post.fecha_publicacion.desc()).all()
+    return render_template('posts.html', posts=posts)
+
+@app.route('/crear-post', methods=['GET', 'POST'])
+@login_required
+def crear_post():
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        contenido = request.form['contenido']
+        
+        nuevo_post = Post(
+            titulo=titulo,
+            contenido=contenido,
+            usuario_id=current_user.id
+        )
+        
+        db.session.add(nuevo_post)
+        db.session.commit()
+        
+        flash('Post creado exitosamente', 'success')
+        return redirect(url_for('listar_posts'))
+    
+    return render_template('crear_post.html')</code></pre>
+            </div>
+        </section>
+
+        <section id="sqlite" class="section">
+            <h2>SQLite - Base de Datos Ligera</h2>
+            <h3>¿Qué es SQLite?</h3>
+            <p>SQLite es una base de datos relacional ligera que no requiere servidor. Es perfecta para desarrollo, prototipos y aplicaciones pequeñas.</p>
+
+            <h3>Trabajando con SQLite en Python</h3>
+            <div class="example">
+                <pre><code>import sqlite3
+from datetime import datetime
+
+def crear_tablas():
+    """Crear las tablas de la base de datos"""
+    conn = sqlite3.connect('mi_base.db')
+    cursor = conn.cursor()
+    
+    # Crear tabla de usuarios
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            fecha_registro TEXT DEFAULT CURRENT_TIMESTAMP,
+            activo INTEGER DEFAULT 1
+        )
+    ''')
+    
+    # Crear tabla de productos
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS productos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            descripcion TEXT,
+            precio REAL NOT NULL,
+            stock INTEGER DEFAULT 0,
+            categoria_id INTEGER,
+            fecha_creacion TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (categoria_id) REFERENCES categorias (id)
+        )
+    ''')
+    
+    # Crear tabla de categorías
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS categorias (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT UNIQUE NOT NULL,
+            descripcion TEXT
+        )
+    ''')
+    
+    conn.commit()
+    conn.close()
+
+def insertar_datos():
+    """Insertar datos de ejemplo"""
+    conn = sqlite3.connect('mi_base.db')
+    cursor = conn.cursor()
+    
+    # Insertar categorías
+    categorias = [
+        ('Electrónicos', 'Productos electrónicos y gadgets'),
+        ('Ropa', 'Ropa y accesorios'),
+        ('Libros', 'Libros y material educativo'),
+    ]
+    
+    cursor.executemany('INSERT OR IGNORE INTO categorias (nombre, descripcion) VALUES (?, ?)', categorias)
+    
+    # Insertar productos
+    productos = [
+        ('Laptop Gaming', 'Laptop potente para gaming', 1299.99, 10, 1),
+        ('Smartphone', 'Teléfono inteligente de última generación', 699.99, 25, 1),
+        ('Camiseta', 'Camiseta de algodón 100%', 19.99, 50, 2),
+        ('Libro Python', 'Guía completa de Python', 39.99, 30, 3),
+    ]
+    
+    cursor.executemany('''
+        INSERT OR IGNORE INTO productos 
+        (nombre, descripcion, precio, stock, categoria_id) 
+        VALUES (?, ?, ?, ?, ?)
+    ''', productos)
+    
+    conn.commit()
+    conn.close()
+
+def consultar_datos():
+    """Consultar datos de la base de datos"""
+    conn = sqlite3.connect('mi_base.db')
+    cursor = conn.cursor()
+    
+    # Consultar todos los productos con su categoría
+    cursor.execute('''
+        SELECT p.id, p.nombre, p.descripcion, p.precio, p.stock, 
+               c.nombre as categoria
+        FROM productos p
+        LEFT JOIN categorias c ON p.categoria_id = c.id
+        ORDER BY p.nombre
+    ''')
+    
+    productos = cursor.fetchall()
+    
+    print("=== PRODUCTOS ===")
+    for producto in productos:
+        print(f"ID: {producto[0]}")
+        print(f"Nombre: {producto[1]}")
+        print(f"Descripción: {producto[2]}")
+        print(f"Precio: ${producto[3]:.2f}")
+        print(f"Stock: {producto[4]}")
+        print(f"Categoría: {producto[5]}")
+        print("-" * 40)
+    
+    # Estadísticas
+    cursor.execute('SELECT COUNT(*), AVG(precio), SUM(stock) FROM productos')
+    stats = cursor.fetchone()
+    
+    print(f"\n=== ESTADÍSTICAS ===")
+    print(f"Total productos: {stats[0]}")
+    print(f"Precio promedio: ${stats[1]:.2f}")
+    print(f"Stock total: {stats[2]}")
+    
+    conn.close()
+
+def buscar_productos(query):
+    """Buscar productos por nombre o descripción"""
+    conn = sqlite3.connect('mi_base.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT p.id, p.nombre, p.descripcion, p.precio, c.nombre as categoria
+        FROM productos p
+        LEFT JOIN categorias c ON p.categoria_id = c.id
+        WHERE p.nombre LIKE ? OR p.descripcion LIKE ?
+        ORDER BY p.nombre
+    ''', (f'%{query}%', f'%{query}%'))
+    
+    resultados = cursor.fetchall()
+    conn.close()
+    
+    return resultados
+
+def actualizar_producto(id, nombre=None, precio=None, stock=None):
+    """Actualizar un producto"""
+    conn = sqlite3.connect('mi_base.db')
+    cursor = conn.cursor()
+    
+    updates = []
+    params = []
+    
+    if nombre is not None:
+        updates.append("nombre = ?")
+        params.append(nombre)
+    
+    if precio is not None:
+        updates.append("precio = ?")
+        params.append(precio)
+    
+    if stock is not None:
+        updates.append("stock = ?")
+        params.append(stock)
+    
+    if updates:
+        query = f"UPDATE productos SET {', '.join(updates)} WHERE id = ?"
+        params.append(id)
+        
+        cursor.execute(query, params)
+        conn.commit()
+        
+        success = cursor.rowcount > 0
+    else:
+        success = False
+    
+    conn.close()
+    return success
+
+def eliminar_producto(id):
+    """Eliminar un producto"""
+    conn = sqlite3.connect('mi_base.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('DELETE FROM productos WHERE id = ?', (id,))
+    conn.commit()
+    
+    deleted = cursor.rowcount > 0
+    conn.close()
+    
+    return deleted
+
+# Uso de las funciones
+if __name__ == '__main__':
+    # Crear base de datos y tablas
+    crear_tablas()
+    print("Base de datos creada")
+    
+    # Insertar datos de ejemplo
+    insertar_datos()
+    print("Datos insertados")
+    
+    # Consultar datos
+    consultar_datos()
+    
+    # Buscar productos
+    resultados = buscar_productos("Laptop")
+    print(f"\nBúsqueda de 'Laptop': {len(resultados)} resultados")
+    
+    # Actualizar producto
+    if actualizar_producto(1, precio=1199.99):
+        print("Producto actualizado")
+    
+    # Mostrar datos actualizados
+    consultar_datos()</code></pre>
+            </div>
+
+            <h3>SQLite con Flask</h3>
+            <div class="example">
+                <pre><code># app.py - Flask con SQLite
+from flask import Flask, render_template, request, redirect, url_for, flash, g
+import sqlite3
+import os
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'tu_clave_secreta'
+DATABASE = 'app.db'
+
+def get_db():
+    """Obtener conexión a la base de datos"""
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+        db.row_factory = sqlite3.Row  # Para acceder por nombre de columna
+    return db
+
+@app.teardown_appcontext
+def close_connection(exception):
+    """Cerrar conexión al finalizar la petición"""
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
+def init_db():
+    """Inicializar base de datos"""
+    with app.app_context():
+        db = get_db()
+        with app.open_resource('schema.sql', mode='r') as f:
+            db.cursor().executescript(f.read())
+        db.commit()
+
+# Crear base de datos si no existe
+if not os.path.exists(DATABASE):
+    init_db()
+
+@app.route('/')
+def index():
+    db = get_db()
+    productos = db.execute('''
+        SELECT p.*, c.nombre as categoria 
+        FROM productos p 
+        LEFT JOIN categorias c ON p.categoria_id = c.id 
+        ORDER BY p.nombre
+    ''').fetchall()
+    
+    return render_template('index.html', productos=productos)
+
+@app.route('/producto/<int:id>')
+def producto(id):
+    db = get_db()
+    producto = db.execute('SELECT * FROM productos WHERE id = ?', (id,)).fetchone()
+    
+    if producto is None:
+        return render_template('404.html'), 404
+    
+    return render_template('producto.html', producto=producto)
+
+@app.route('/agregar', methods=['GET', 'POST'])
+def agregar():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        descripcion = request.form['descripcion']
+        precio = float(request.form['precio'])
+        stock = int(request.form['stock'])
+        categoria_id = int(request.form['categoria_id'])
+        
+        db = get_db()
+        db.execute('''
+            INSERT INTO productos (nombre, descripcion, precio, stock, categoria_id)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (nombre, descripcion, precio, stock, categoria_id))
+        db.commit()
+        
+        flash('Producto agregado exitosamente', 'success')
+        return redirect(url_for('index'))
+    
+    # Obtener categorías para el formulario
+    db = get_db()
+    categorias = db.execute('SELECT * FROM categorias ORDER BY nombre').fetchall()
+    
+    return render_template('agregar.html', categorias=categorias)
+
+@app.route('/editar/<int:id>', methods=['GET', 'POST'])
+def editar(id):
+    db = get_db()
+    
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        descripcion = request.form['descripcion']
+        precio = float(request.form['precio'])
+        stock = int(request.form['stock'])
+        categoria_id = int(request.form['categoria_id'])
+        
+        db.execute('''
+            UPDATE productos 
+            SET nombre = ?, descripcion = ?, precio = ?, stock = ?, categoria_id = ?
+            WHERE id = ?
+        ''', (nombre, descripcion, precio, stock, categoria_id, id))
+        db.commit()
+        
+        flash('Producto actualizado exitosamente', 'success')
+        return redirect(url_for('index'))
+    
+    # Obtener producto y categorías
+    producto = db.execute('SELECT * FROM productos WHERE id = ?', (id,)).fetchone()
+    categorias = db.execute('SELECT * FROM categorias ORDER BY nombre').fetchall()
+    
+    if producto is None:
+        return render_template('404.html'), 404
+    
+    return render_template('editar.html', producto=producto, categorias=categorias)
+
+@app.route('/eliminar/<int:id>', methods=['POST'])
+def eliminar(id):
+    db = get_db()
+    db.execute('DELETE FROM productos WHERE id = ?', (id,))
+    db.commit()
+    
+    flash('Producto eliminado exitosamente', 'success')
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    app.run(debug=True)</code></pre>
+            </div>
+        </section>
+
+        <section id="comparacion" class="section">
+            <h2>Django vs Flask - ¿Cuál elegir?</h2>
+            <h3>Django - Framework Completo</h3>
+            <ul>
+                <li><strong>Ventajas:</strong>
+                    <ul>
+                        <li>Baterías incluidas (admin, auth, ORM, etc.)</li>
+                        <li>Estructura clara y consistente</li>
+                        <li>Excelente para aplicaciones grandes</li>
+                        <li>Seguridad integrada</li>
+                        <li>Comunidad grande y madura</li>
+                    </ul>
+                </li>
+                <li><strong>Desventajas:</strong>
+                    <ul>
+                        <li>Curva de aprendizaje más pronunciada</li>
+                        <li>Menos flexible para proyectos pequeños</li>
+                        <li>Más "pesado" para APIs simples</li>
+                    </ul>
+                </li>
+                <li><strong>Cuándo usar:</strong> Aplicaciones web complejas, e-commerce, CMS, aplicaciones empresariales</li>
+            </ul>
+
+            <h3>Flask - Microframework</h3>
+            <ul>
+                <li><strong>Ventajas:</strong>
+                    <ul>
+                        <li>Minimalista y flexible</li>
+                        <li>Curva de aprendizaje suave</li>
+                        <li>Perfecto para APIs y microservicios</li>
+                        <li>Control total sobre las decisiones</li>
+                        <li>Ligero y rápido</li>
+                    </ul>
+                </li>
+                <li><strong>Desventajas:</strong>
+                    <ul>
+                        <li>Menos estructura por defecto</li>
+                        <li>Requiere más decisiones iniciales</li>
+                        <li>Menos herramientas integradas</li>
+                        <li>Mantenimiento manual de extensiones</li>
+                    </ul>
+                </li>
+                <li><strong>Cuándo usar:</strong> APIs REST, prototipos, aplicaciones pequeñas, microservicios</li>
+            </ul>
+
+            <h3>SQLite - Base de Datos</h3>
+            <ul>
+                <li><strong>Ventajas:</strong>
+                    <ul>
+                        <li>No requiere servidor</li>
+                        <li>Archivo único portable</li>
+                        <li>Rápido para operaciones locales</li>
+                        <li>Ideal para desarrollo y prototipos</li>
+                        <li>Sin configuración</li>
+                    </ul>
+                </li>
+                <li><strong>Desventajas:</strong>
+                    <ul>
+                        <li>No escalable para múltiples usuarios</li>
+                        <li>Limitado para aplicaciones grandes</li>
+                        <li>Menos características avanzadas</li>
+                        <li>No soporta concurrencia compleja</li>
+                    </ul>
+                </li>
+                <li><strong>Cuándo usar:</strong> Desarrollo local, prototipos, aplicaciones de escritorio, datos embebidos</li>
+            </ul>
+        </section>
+
+        <section id="proyectos" class="section">
+            <h2>Proyectos Prácticos con Python</h2>
+            <h3>Django: Blog Personal</h3>
+            <p>Sistema completo de blog con Django: artículos, categorías, comentarios, panel de administración y API REST.</p>
+
+            <h3>Django: E-commerce</h3>
+            <p>Tienda online completa con carrito de compras, pagos, inventario y panel de administración.</p>
+
+            <h3>Flask: API REST</h3>
+            <p>API RESTful con autenticación JWT, documentación automática y tests unitarios.</p>
+
+            <h3>Flask: Dashboard</h3>
+            <p>Panel de administración con gráficos, reportes y gestión de datos en tiempo real.</p>
+
+            <h3>Aplicación Full-Stack</h3>
+            <p>Proyecto completo combinando Django/Flask en el backend con cualquier framework frontend.</p>
+        </section>
+    </div>
+</body>
+</html>
